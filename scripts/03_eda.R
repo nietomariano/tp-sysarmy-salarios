@@ -46,11 +46,37 @@ colnames(df)
 colSums(is.na(df))
 sort(colSums(is.na(df)), decreasing = TRUE)
 
-# CONCLUSIÓN:
-# Las variables principales no presentan faltantes.
-# Seniority, sueldo_dolarizado y uso_ia poseen aproximadamente
-# 67% de NAs, probablemente debido a cambios en el cuestionario
-# entre distintos periodos de la encuesta.
+
+
+df %>%
+  group_by(anio,semestre) %>%
+  summarise(
+    registros = n(),
+    seniority_na = sum(is.na(seniority)),
+    dolarizado_na = sum(is.na(sueldo_dolarizado)),
+    modalidad_na = sum(is.na(modalidad)),
+    uso_ia_na = sum(is.na(uso_ia))
+  )
+
+
+# CONCLUSION:
+# Las variables principales utilizadas para el análisis no presentan
+# valores faltantes.
+#
+# Seniority, sueldo_dolarizado y uso_ia presentan aproximadamente
+# un 67% de valores faltantes. Sin embargo, el analisis por períodos
+# nos muestra que estos faltantes no son aleatorios.
+#
+# Las variables seniority y sueldo_dolarizado se encuentran
+# disponibles a partir de la encuesta del periodo 2024.1,
+# mientras que uso_ia aparece a partir de 2022.2.
+#
+# Por lo tanto, los valores faltantes responden a cambios en el
+# cuestionario de Sysarmy entre distintos períodos y no a errores
+# de carga o falta de respuesta de los encuestados.
+# Buscamos a que periodos pertenecen los N/A o la mayor cantidad
+
+
 
 # -----------------------------------------------------------------------------
 # 4. DISTRIBUCIONES UNIVARIADAS

@@ -29,7 +29,6 @@ df <- read_csv(
 # -----------------------------------------------------------------------------
 
 glimpse(df)
-dim(df)
 colnames(df)
 
 # -----------------------------------------------------------------------------
@@ -168,9 +167,10 @@ ggplot(df, aes(x = log_sal)) +
   theme_minimal()
 
 
+
 # Histograma con densidad — linea roja muestra curva de densidad estimada
-# Grafico principal de esta seccion — se observa distribución bimodal
-# Dos picos sugieren dos grupos salariales distintos (pesos vs dolares)
+# Grafico principal de esta seccion — se observa distribucion bimodal
+# Dos picos sugieren -> dos grupos salariales distintos (pesos vs dolares)
 ggplot(df, aes(x = log_sal)) +
   geom_histogram(
     aes(y = after_stat(density)),
@@ -185,6 +185,8 @@ ggplot(df, aes(x = log_sal)) +
   theme_minimal()
 
 
+
+# Boxplot del logarito del salario bruto
 ggplot(df, aes(y = log_sal)) +
   geom_boxplot(fill = "steelblue") +
   labs(
@@ -193,6 +195,7 @@ ggplot(df, aes(y = log_sal)) +
     x = ""
   ) +
   theme_minimal()
+
 
 # -----------------------------------------------------------------------------
 # 6. VARIABLES NUMERICAS

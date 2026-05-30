@@ -313,6 +313,7 @@ ggplot(df %>% filter(!is.na(sueldo_dolarizado)),
 # SUELDO DOLARIZADO: Experiencia vs Salario segun dolarizacion
 # SIN N/A, aclaramos con caption
 
+
 ggplot(df %>% filter(!is.na(sueldo_dolarizado)),
        aes(x = experiencia, 
            y = log_sal,
@@ -331,14 +332,16 @@ ggplot(df %>% filter(!is.na(sueldo_dolarizado)),
 
 
 
-#  Observacionn: qioenes cobran en dolares parecieran tener un mejor sueldo.
+#  Observacionn: 
 
 # PERSONAS A CARGO
 
 
 ggplot(df,
-       aes(x = gente_a_cargo_grupo, 
-           y = log_sal, 
+       aes(x = factor(gente_a_cargo_grupo,
+                      levels = c("Sin equipo", "Equipo pequeño",
+                                 "Equipo mediano", "Equipo grande")),
+           y = log_sal,
            fill = gente_a_cargo_grupo)) +
   geom_boxplot() +
   labs(
@@ -420,232 +423,52 @@ df %>%
 # -----------------------------------------------------------------------------
 
 
-# SUELDOS EN RELACION AL GENERO
-
-ggplot(df, aes(x = genero_simple, y = log_sal)) +
-  geom_boxplot()
 
 
-# GENERO SIN CONTROLAR SENIORITY
+# Genero vs salario — sin controlar por seniority
 
-ggplot(
-  df,
-  aes(
-    x = genero_simple,
-    y = log_sal,
-    fill = genero_simple
-  )
-) +
-  geom_boxplot() +
-  theme(
-    legend.position = "none"
-  )
-
-# Posible variable confundidora seniority
-# GENERO Vs SALARIO POR SENIORITY
-
-ggplot(
-  df,
-  aes(
-    x = genero_simple,
-    y = log_sal,
-    fill = seniority
-  )
-) +
-  geom_boxplot()
-
-
-# DISTRIBUCION SALARIAL POR GENERO Y SENIORITY
-
-ggplot(
-  df,
-  aes(
-    x = genero_simple,
-    y = log_sal,
-    fill = seniority
-  )
-) +
-  geom_violin()
-
-
-# DISTRIBUCION DE SENIORITY POR GENERO
-
-
-ggplot(
-  df,
-  aes(
-    x = genero_simple,
-    fill = seniority
-  )
-) +
-  geom_bar(
-    position = "dodge"
-  )
-
-# PROPORCION
-
-ggplot(
-  df,
-  aes(
-    x = genero_simple,
-    fill = seniority
-  )
-) +
-  geom_bar(
-    position = "fill"
-  )
-
-# Tabla de apoyo para examinar cantidades y proporciones
-
-
-df %>%
-  count(
-    genero_simple,
-    seniority
-  ) %>%
-  group_by(genero_simple) %>%
-  mutate(
-    porcentaje = n / sum(n)
-  )
-
-
-# OBSERVACIONES: 
-
-
-
-
-# -----------------------------------------------------------------------------
-# 9. REGION Y ROLES
-# -----------------------------------------------------------------------------
-
-# Boxplot: Salario segun region
-
-ggplot(
-  df,
-  aes(
-    x = region,
-    y = log_sal,
-    fill = region
-  )
-) +
+ggplot(df,
+       aes(x = genero_simple, y = log_sal, fill = genero_simple)) +
   geom_boxplot() +
   labs(
-    title = "Salario según región",
-    x = "Región",
-    y = "Logaritmo del salario"
+    title = "Distribución salarial según género",
+    x = "Género",
+    y = "Logaritmo del salario bruto (log)"
   ) +
-  theme(
-    legend.position = "none"
-  )
+  theme_minimal() +
+  theme(legend.position = "none")
 
 
-# Violin: Salario segun region
 
-ggplot(
-  df,
-  aes(
-    x = region,
-    y = log_sal,
-    fill = region
-  )
-) +
-  geom_violin() +
-  labs(
-    title = "Distribución salarial según región",
-    x = "Región",
-    y = "Logaritmo del salario"
-  ) +
-  theme(
-    legend.position = "none"
-  )
+# Genero vs salario sin controlar — mediana mujeres levemente superior a hombres
 
-# Tabla de apoyo para examinar datos usados
-
-df %>%
-  group_by(region) %>%
-  summarise(
-    mediana_salario = median(sal_bruto, na.rm = TRUE),
-    cantidad = n()
-  )
-
-# POR ROLES
-
-# Tabla de apoyo para ver cuales son los roles con mas frecuencia.
-
-df %>%
-  count(trabajo_de, sort = TRUE)
-
-# TOP 15 ROLES
-
-top_roles <- df %>%
-  count(trabajo_de, sort = TRUE) %>%
-  slice_head(n = 15) %>%
-  pull(trabajo_de)
-
-
-df %>%
-  filter(trabajo_de %in% top_roles) %>%
-  ggplot(
-    aes(
-      x = reorder(trabajo_de, log_sal, median),
-      y = log_sal,
-      fill = trabajo_de
-    )
-  ) +
-  geom_boxplot() +
-  coord_flip() +
-  labs(
-    title = "Salario por ocupación",
-    x = "Rol",
-    y = "Logaritmo del salario"
-  ) +
-  theme(
-    legend.position = "none"
-  )
-
-
-# Boxplot: Salario segun grupo de rol (sector)
-
-
-ggplot(
-  df,
-  aes(
-    x = grupo_rol,
-    y = log_sal,
-    fill = grupo_rol
-  )
-) +
+ggplot(df %>% filter(!is.na(seniority)),
+       aes(x = genero_simple, y = log_sal, fill = seniority)) +
   geom_boxplot() +
   labs(
-    title = "Salario según grupo de rol",
-    x = "Grupo de rol",
-    y = "Logaritmo del salario"
+    title = "Distribución salarial según género y seniority",
+    x = "Género",
+    y = "Logaritmo del salario bruto (log)",
+    fill = "Seniority",
+    caption = "Solo períodos 2024-2026 | n = 5.091 observaciones"
   ) +
-  theme(
-    legend.position = "none"
-  )
+  theme_minimal()
 
 
-# Violin: Salario segun grupo de rol (sector)
 
+# Seniority como confundidora — hombres ~50% Senior vs mujeres ~30% Senior
 
-ggplot(
-  df,
-  aes(
-    x = grupo_rol,
-    y = log_sal,
-    fill = grupo_rol
-  )
-) +
-  geom_violin() +
+ggplot(df %>% filter(!is.na(seniority)),
+       aes(x = genero_simple, fill = seniority)) +
+  geom_bar(position = "fill") +
   labs(
-    title = "Distribución salarial según grupo de rol",
-    x = "Grupo de rol",
-    y = "Logaritmo del salario"
+    title = "Proporción de seniority según género",
+    x = "Género",
+    y = "Proporción",
+    fill = "Seniority",
+    caption = "Solo períodos 2024-2026 | n = 5.091 observaciones"
   ) +
-  theme(
-    legend.position = "none"
-  )
+  theme_minimal()
 
 
 # Tabla de apoyo
@@ -662,6 +485,69 @@ df %>%
 
 # OBSERVACIONES: 
 
+# -----------------------------------------------------------------------------
+# 9. REGIONES Y ROLES
+# -----------------------------------------------------------------------------
+
+# Salario según región
+# Grafico región — GBA/Prov. BA tiene una caja muy compacta y alta. 
+
+
+ggplot(df,
+       aes(x = region, y = log_sal, fill = region)) +
+  geom_boxplot() +
+  labs(
+    title = "Distribución salarial según región",
+    x = "Región",
+    y = "Logaritmo del salario bruto (log)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+
+# Observamos cantidad de observaciones en GBA para descartar errores
+# 915 observaciones son suficientes para comparar
+# los salarios en GBA están más concentrados en un rango alto con poca dispersion.
+df %>% count(region)
+
+
+
+
+# Salario según grupo de rol
+ggplot(df,
+       aes(x = grupo_rol, y = log_sal, fill = grupo_rol)) +
+  geom_boxplot() +
+  labs(
+    title = "Distribución salarial según grupo de rol",
+    x = "Grupo de rol",
+    y = "Logaritmo del salario bruto (log)"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 15, hjust = 1)
+  )
+
+
+# Top roles individuales — salario por ocupación
+top_roles <- df %>%
+  count(trabajo_de, sort = TRUE) %>%
+  slice_head(n = 10) %>%
+  pull(trabajo_de)
+
+ggplot(df %>% filter(trabajo_de %in% top_roles),
+       aes(x = reorder(trabajo_de, log_sal, median),
+           y = log_sal,
+           fill = grupo_rol)) +
+  geom_boxplot() +
+  coord_flip() +
+  labs(
+    title = "Distribución salarial por rol — Top 10",
+    x = "Rol",
+    y = "Logaritmo del salario bruto (log)",
+    fill = "Grupo de rol"
+  ) +
+  theme_minimal()
 
 
 # -----------------------------------------------------------------------------

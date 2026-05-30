@@ -40,14 +40,17 @@ colnames(df)
 
 
 # -----------------------------------------------------------------------------
-# 3. CALIDAD DE DATOS 
+# 3. CALIDAD DE DATOS
 # -----------------------------------------------------------------------------
-
 
 colSums(is.na(df))
 sort(colSums(is.na(df)), decreasing = TRUE)
 
-
+# CONCLUSIÓN:
+# Las variables principales no presentan faltantes.
+# Seniority, sueldo_dolarizado y uso_ia poseen aproximadamente
+# 67% de NAs, probablemente debido a cambios en el cuestionario
+# entre distintos periodos de la encuesta.
 
 # -----------------------------------------------------------------------------
 # 4. DISTRIBUCIONES UNIVARIADAS

@@ -43,11 +43,6 @@ log_sal = log(salario_bruto)
 Se utiliza la transformación logarítmica para reducir la asimetría presente en la distribución salarial y cumplir mejor los supuestos de los modelos de regresión lineal.
 
 
-## Resultados esperados
-
-Identificar qué variables tienen mayor capacidad explicativa sobre los salarios del sector IT argentino y cuantificar su impacto relativo.
-
-
 ## Metodología
 
 El proyecto se desarrolla en cuatro etapas:

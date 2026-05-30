@@ -436,9 +436,10 @@ df %>%
 
 
 
-
-# Genero vs salario — sin controlar por seniority
-
+# GENERO
+# Sin controlar por seniority — mujeres muestran mediana levemente superior
+# Conclusion apresurada: no hay brecha salarial de genero
+# Este grafico solo es el punto de partida — ver gráficos 2 y 3
 ggplot(df,
        aes(x = genero_simple, y = log_sal, fill = genero_simple)) +
   geom_boxplot() +
@@ -447,13 +448,12 @@ ggplot(df,
     x = "Género",
     y = "Logaritmo del salario bruto (log)"
   ) +
-  theme(legend.position = "none")+
   theme_minimal()
 
 
-
-# Genero vs salario sin controlar — mediana mujeres levemente superior a hombres
-
+# Controlando por seniority - distribuciones de hombre y mujer muy similares
+# El patron Junior < Semi-Senior < Senior se repite igual en ambos generos.
+# La brecha que observamos en el grafico 1 desaparece al controlar por seniority.
 ggplot(df %>% filter(!is.na(seniority)),
        aes(x = genero_simple, y = log_sal, fill = seniority)) +
   geom_boxplot() +
@@ -468,8 +468,10 @@ ggplot(df %>% filter(!is.na(seniority)),
 
 
 
-# Seniority como confundidora — hombres ~50% Senior vs mujeres ~30% Senior
-
+# Hombres tienen mayor proporcion de Senior (~50%) vs mujeres (~30%)
+# Mujeres tienen mayor proporcion de Junior y Semi-Senior
+# Explica porque el genero parece relevante sin controlar si 
+# es el seniority el factor real
 ggplot(df %>% filter(!is.na(seniority)),
        aes(x = genero_simple, fill = seniority)) +
   geom_bar(position = "fill") +

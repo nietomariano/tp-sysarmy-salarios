@@ -39,7 +39,7 @@ roles_core <- c(
 roles_data_platform <- c(
   "SysAdmin / DevOps / SRE",
   "DBA",
-  "Infrasctruture Engineer"
+  "Infrastruture Engineer"
 )
 
 roles_analytics <- c(
@@ -229,7 +229,7 @@ df_clean <- df_clean %>%
   )
 
 # -----------------------------------------------------------------------------
-# 7. FILTRO DE OUTLIERS EN SALARIO
+# 7. FILTRO DE OUTLIERS EN SALARIO Y EDAD
 # -----------------------------------------------------------------------------
 
 q1 <- quantile(df_clean$sal_bruto, 0.01, na.rm = TRUE)
@@ -238,9 +238,9 @@ q99 <- quantile(df_clean$sal_bruto, 0.99, na.rm = TRUE)
 df_clean <- df_clean %>%
   filter(
     sal_bruto >= q1,
-    sal_bruto <= q99
+    sal_bruto <= q99,
+    is.na(edad) | (edad >= 16 & edad <= 70)  # elimina datos corruptos como 20000
   )
-
 
 
 # -----------------------------------------------------------------------------
@@ -316,6 +316,3 @@ write_csv(
   df_clean,
   "data/processed/df_sysarmy.csv"
 )
-
-
-df_ver<-read_csv("data/processed/df_sysarmy.csv")

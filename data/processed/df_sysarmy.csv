@@ -172,7 +172,6 @@ anio,semestre,periodo,trabajo_de,grupo_rol,dedicacion,sal_bruto,log_sal,sueldo_d
 2019,1,2019.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,NA,30000,10.308952660644293,NA,NA,5,3,3,0,Sin equipo,Otro,NA,NA,Hombre,33,Universitario,CABA,NA
 2019,1,2019.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,NA,79000,11.27720313144916,NA,NA,10,0,3,0,Sin equipo,Otro,NA,NA,Hombre,32,Universitario,CABA,NA
 2019,1,2019.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,NA,56000,10.933106969717286,NA,NA,9,0,0,0,Sin equipo,Tercerizado,NA,NA,Hombre,28,Terciario,CABA,NA
-2019,1,2019.1,Infosec,Governance / Security,NA,48000,10.778956289890028,NA,NA,15,0,6,0,Sin equipo,Otro,NA,NA,Hombre,1111,Universitario,CABA,NA
 2019,1,2019.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,NA,103000,11.542484267211773,NA,NA,9,0,8,0,Sin equipo,Otro,NA,NA,Hombre,29,Universitario,CABA,NA
 2019,1,2019.1,BI Analyst / Data Analyst,Data Science / AI,NA,10000,9.210340371976184,NA,NA,1,0,0,0,Sin equipo,Otro,NA,NA,Mujer,26,Terciario,CABA,NA
 2019,1,2019.1,Infosec,Governance / Security,NA,72000,11.184421397998193,NA,NA,5,5,5,3,Equipo pequeño,Otro,NA,NA,Hombre,32,Terciario,CABA,NA
@@ -4082,7 +4081,6 @@ anio,semestre,periodo,trabajo_de,grupo_rol,dedicacion,sal_bruto,log_sal,sueldo_d
 2021,1,2021.1,Data Scientist,Data Science / AI,NA,300000,12.611537753638338,NA,NA,10,1,4,0,Sin equipo,Otro,NA,NA,Hombre,37,NA,CABA,NA
 2021,1,2021.1,BI Analyst / Data Analyst,Data Science / AI,NA,121000,11.703545824578878,NA,NA,10,6,1,1,Equipo pequeño,Otro,NA,NA,Hombre,31,NA,Interior,NA
 2021,1,2021.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,NA,190000,12.154779351142624,NA,NA,20,0,7,0,Sin equipo,Otro,NA,NA,Hombre,47,Universitario,CABA,NA
-2021,1,2021.1,Infosec,Governance / Security,NA,230000,12.345834587905333,NA,NA,3,1,1,0,Sin equipo,Otro,NA,NA,Otro/No binarie,20000,Universitario,CABA,NA
 2021,1,2021.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,NA,23000,10.043249494911286,NA,NA,11,9,6,2,Equipo pequeño,Otro,NA,NA,Otro/No binarie,39,Universitario,Interior,NA
 2021,1,2021.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,NA,77000,11.251560700835821,NA,NA,6,4,2,0,Sin equipo,Otro,NA,NA,Otro/No binarie,31,Secundario,CABA,NA
 2021,1,2021.1,BI Analyst / Data Analyst,Data Science / AI,NA,23000,10.043249494911286,NA,NA,1,1,1,0,Sin equipo,Otro,NA,NA,Hombre,28,NA,Interior,NA
@@ -4174,7 +4172,6 @@ anio,semestre,periodo,trabajo_de,grupo_rol,dedicacion,sal_bruto,log_sal,sueldo_d
 2021,1,2021.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,NA,95000,11.461632170582678,NA,NA,15,1,10,0,Sin equipo,Otro,NA,NA,Hombre,48,NA,CABA,NA
 2021,1,2021.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,NA,224000,12.319401330837177,NA,NA,4,0,2,0,Sin equipo,Otro,NA,NA,Hombre,30,Universitario,CABA,NA
 2021,1,2021.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,NA,103615,11.548437385971589,NA,NA,8,1,5,0,Sin equipo,Otro,NA,NA,Hombre,32,Terciario,CABA,NA
-2021,1,2021.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,NA,350000,12.765688433465597,NA,NA,15,1,1,0,Sin equipo,Otro,NA,NA,Otro/No binarie,105,Universitario,CABA,NA
 2021,1,2021.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,NA,202000,12.216022976383341,NA,NA,14,7,3,0,Sin equipo,Otro,NA,NA,Hombre,37,NA,CABA,NA
 2021,1,2021.1,Business Analyst,Analytics / Automation,NA,150000,11.918390573078392,NA,NA,10,0,0,0,Sin equipo,Otro,NA,NA,Hombre,32,NA,CABA,NA
 2021,1,2021.1,Data Scientist,Data Science / AI,NA,1500000,14.22097566607244,NA,NA,7,0,7,0,Sin equipo,Freelance,NA,NA,Hombre,41,NA,CABA,NA
@@ -6997,7 +6994,6 @@ anio,semestre,periodo,trabajo_de,grupo_rol,dedicacion,sal_bruto,log_sal,sueldo_d
 2022,1,2022.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,NA,350000,12.765688433465597,NA,NA,15,9,8,1,Equipo pequeño,Otro,NA,NA,Hombre,31,NA,Interior,NA
 2022,1,2022.1,Data Engineer,Data Science / AI,NA,164000,12.007621706806335,NA,NA,4,1,4,0,Sin equipo,Otro,NA,1,Hombre,30,Universitario,Interior,NA
 2022,1,2022.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,NA,145000,11.884489021402711,NA,NA,1,0,0,0,Sin equipo,Otro,NA,NA,Hombre,30,NA,Interior,NA
-2022,1,2022.1,Data Engineer,Data Science / AI,NA,185000,12.128111104060462,NA,NA,12,0,5,0,Sin equipo,Otro,NA,NA,Hombre,333,Terciario,Interior,NA
 2022,1,2022.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,NA,130000,11.77528972943772,NA,NA,6,0,0,0,Sin equipo,Otro,NA,NA,Hombre,29,NA,Interior,NA
 2022,1,2022.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,NA,149000,11.911701584927597,NA,NA,15,13,13,0,Sin equipo,Otro,NA,NA,Hombre,40,NA,Interior,NA
 2022,1,2022.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,NA,165000,12.013700752882718,NA,NA,1,0,0,0,Sin equipo,Otro,NA,NA,Hombre,30,NA,Interior,NA
@@ -7757,7 +7753,6 @@ anio,semestre,periodo,trabajo_de,grupo_rol,dedicacion,sal_bruto,log_sal,sueldo_d
 2022,2,2022.2,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,1540000,14.247292974389811,NA,NA,5,2,2,0,Sin equipo,Otro,Remoto,11-50,Hombre,33,NA,Interior,NA
 2022,2,2022.2,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,500000,13.122363377404328,NA,NA,11,1,1,0,Sin equipo,Otro,Remoto,2001-5000,Hombre,32,NA,Interior,NA
 2022,2,2022.2,Data Engineer,Data Science / AI,Full-Time,170000,12.043553716032399,NA,NA,1,1,1,0,Sin equipo,Tercerizado,Remoto,501-1000,Hombre,26,Universitario,Interior,NA
-2022,2,2022.2,Data Scientist,Data Science / AI,Full-Time,1500000,14.22097566607244,NA,NA,20,1,1,3,Equipo pequeño,Staff,Remoto,5001-10000,Otro/No binarie,0,NA,Interior,NA
 2022,2,2022.2,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,270000,12.506177237980511,NA,NA,5,6,3,3,Equipo pequeño,Staff,Remoto,1001-2000,Otro/No binarie,35,NA,Interior,NA
 2022,2,2022.2,Business Analyst,Analytics / Automation,Full-Time,171.82219000000003,5.1464601630255515,NA,NA,1,0,0,0,Sin equipo,Staff,Remoto,+10000,Mujer,28,Universitario,Interior,NA
 2022,2,2022.2,BI Analyst / Data Analyst,Data Science / AI,Full-Time,325000,12.691580461311874,NA,NA,3,0,0,0,Sin equipo,Staff,Remoto,201-500,Mujer,29,Maestría,Interior,NA
@@ -8162,7 +8157,6 @@ anio,semestre,periodo,trabajo_de,grupo_rol,dedicacion,sal_bruto,log_sal,sueldo_d
 2022,2,2022.2,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,468600,13.057504805055832,NA,NA,14,4,4,0,Sin equipo,Staff,Hibrido,1001-2000,Hombre,39,Universitario,Interior,NA
 2022,2,2022.2,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,214876,12.27781639654285,NA,NA,3,3,3,0,Sin equipo,Staff,Remoto,2001-5000,Hombre,30,Universitario,Interior,NA
 2022,2,2022.2,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,183000,12.117241431823558,NA,NA,2,9,2,0,Sin equipo,Staff,Remoto,+10000,Otro/No binarie,39,NA,Interior,NA
-2022,2,2022.2,Business Analyst,Analytics / Automation,Full-Time,210000,12.254862809699606,NA,NA,4,1,1,1,Equipo pequeño,Tercerizado,Remoto,5001-10000,Otro/No binarie,9,NA,Interior,NA
 2022,2,2022.2,BI Analyst / Data Analyst,Data Science / AI,Part-Time,74000,11.211820372186306,NA,NA,1,1,1,0,Sin equipo,Tercerizado,Remoto,2-10,Mujer,21,NA,Interior,NA
 2022,2,2022.2,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,215223,12.279429978882213,NA,NA,14,14,14,0,Sin equipo,Staff,Presencial,101-200,Mujer,36,NA,Interior,NA
 2022,2,2022.2,Data Scientist,Data Science / AI,Full-Time,176370.2,12.080340474043469,NA,NA,5,5,5,0,Sin equipo,Staff,Hibrido,11-50,Mujer,30,NA,Interior,NA
@@ -10149,7 +10143,6 @@ anio,semestre,periodo,trabajo_de,grupo_rol,dedicacion,sal_bruto,log_sal,sueldo_d
 2023,2,2023.2,Data Scientist,Data Science / AI,Full-Time,860000,13.664687668229691,NA,NA,5,1,1,0,Sin equipo,Staff,Remoto,+10000,Hombre,27,NA,Interior,NA
 2023,2,2023.2,DBA,Data Platform / MLOps,Full-Time,493000,13.108264453024827,NA,NA,3,2,2,0,Sin equipo,Staff,Hibrido,101-200,Hombre,25,NA,Interior,NA
 2023,2,2023.2,Data Scientist,Data Science / AI,Full-Time,1872000,14.442517936019675,NA,NA,6,1,1,0,Sin equipo,Tercerizado,Remoto,51-100,Hombre,30,NA,Interior,NA
-2023,2,2023.2,Business Analyst,Analytics / Automation,Full-Time,402171.14999999997,12.904633023265587,NA,NA,12,1,1,0,Sin equipo,Staff,Remoto,201-500,Otro/No binarie,366,NA,Interior,NA
 2023,2,2023.2,Data Scientist,Data Science / AI,Full-Time,300000,12.611537753638338,NA,NA,1,1,1,4,Equipo pequeño,Freelance,Remoto,51-100,Hombre,37,NA,Interior,NA
 2023,2,2023.2,Data Engineer,Data Science / AI,Full-Time,742500,13.517778149658993,NA,NA,1,0,0,0,Sin equipo,Contractor,Remoto,2-10,Hombre,30,NA,Interior,NA
 2023,2,2023.2,BI Analyst / Data Analyst,Data Science / AI,Full-Time,392840,12.881157683271711,NA,NA,8,7,2,0,Sin equipo,Staff,Remoto,2001-5000,Hombre,29,NA,Interior,NA
@@ -10498,7 +10491,6 @@ anio,semestre,periodo,trabajo_de,grupo_rol,dedicacion,sal_bruto,log_sal,sueldo_d
 2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,4000000,15.201804919084164,TRUE,Senior,10,0,0,0,Sin equipo,Contractor,Remoto,51-100,Hombre,37,Universitario,Interior,0
 2024,1,2024.1,Infosec,Governance / Security,Full-Time,3500000,15.068273526459642,TRUE,Semi-Senior,3,2,2,0,Sin equipo,Staff,Hibrido,+10000,Mujer,25,NA,CABA,5
 2024,1,2024.1,Infosec,Governance / Security,Full-Time,2000000,14.508657738524219,TRUE,Senior,20,0,0,0,Sin equipo,Staff,Remoto,51-100,Hombre,37,NA,CABA,4
-2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,2500000,14.73180128983843,TRUE,Senior,18,4,15,0,Sin equipo,Staff,Hibrido,5001-10000,Hombre,666,NA,CABA,0
 2024,1,2024.1,Data Engineer,Data Science / AI,Full-Time,3000000,14.914122846632385,TRUE,Senior,12,3,1,0,Sin equipo,Freelance,Remoto,101-200,Hombre,43,NA,GBA / Prov. BA,3
 2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Part-Time,600000,13.304684934198283,TRUE,Senior,20,11,11,2,Equipo pequeño,Staff,Remoto,2-10,Hombre,45,Terciario,Interior,3
 2024,1,2024.1,Data Scientist,Data Science / AI,Full-Time,2055970,14.536258314011048,TRUE,Senior,6,5,3,0,Sin equipo,Tercerizado,Hibrido,+10000,Hombre,31,NA,CABA,3
@@ -10530,7 +10522,6 @@ anio,semestre,periodo,trabajo_de,grupo_rol,dedicacion,sal_bruto,log_sal,sueldo_d
 2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,1676675,14.332323223574388,TRUE,Semi-Senior,3,2,3,0,Sin equipo,Staff,Remoto,101-200,Hombre,30,Universitario,Interior,1
 2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,4870000,15.398604495058773,TRUE,Senior,16,4,1,0,Sin equipo,Staff,Remoto,1001-2000,Hombre,39,Universitario,GBA / Prov. BA,4
 2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,2700000,14.808762330974558,TRUE,Junior,2,0,2,0,Sin equipo,Contractor,Remoto,11-50,Mujer,29,Secundario,Interior,4
-2024,1,2024.1,Data Scientist,Data Science / AI,Full-Time,3000000,14.914122846632385,TRUE,Semi-Senior,5,5,5,2,Equipo pequeño,Freelance,Remoto,+10000,Otro/No binarie,77,NA,Interior,5
 2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,1000000,13.815510557964274,TRUE,Junior,1,1,1,0,Sin equipo,Tercerizado,Remoto,11-50,Hombre,32,Terciario,GBA / Prov. BA,5
 2024,1,2024.1,Infosec,Governance / Security,Full-Time,2100000,14.557447902693651,TRUE,Senior,7,3,3,0,Sin equipo,Staff,Remoto,2001-5000,Mujer,29,Posgrado/Especialización,Interior,3
 2024,1,2024.1,Data Engineer,Data Science / AI,Full-Time,4384500,15.293586152201547,TRUE,Semi-Senior,4,1,1,0,Sin equipo,Contractor,Remoto,51-100,Hombre,25,Universitario,GBA / Prov. BA,5
@@ -10596,7 +10587,6 @@ anio,semestre,periodo,trabajo_de,grupo_rol,dedicacion,sal_bruto,log_sal,sueldo_d
 2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,500000,13.122363377404328,TRUE,Junior,1,1,1,0,Sin equipo,Staff,Remoto,2-10,Hombre,38,Maestría,CABA,5
 2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,3000000,14.914122846632385,TRUE,Senior,6,6,2,3,Equipo pequeño,Staff,Remoto,101-200,Hombre,34,NA,CABA,4
 2024,1,2024.1,Business Analyst,Analytics / Automation,Full-Time,4449600,15.308324762461837,TRUE,Senior,7,2,2,0,Sin equipo,Contractor,Remoto,201-500,Mujer,39,Universitario,CABA,4
-2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,2500000,14.73180128983843,TRUE,Senior,20,6,6,0,Sin equipo,Staff,Remoto,51-100,Otro/No binarie,100,NA,Interior,3
 2024,1,2024.1,BI Analyst / Data Analyst,Data Science / AI,Full-Time,650000,13.38472764187182,TRUE,Semi-Senior,3,1,1,3,Equipo pequeño,Contractor,Hibrido,11-50,Mujer,20,NA,CABA,2
 2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,8000000,15.89495209964411,TRUE,Senior,15,3,2,0,Sin equipo,Staff,Remoto,501-1000,Hombre,39,NA,CABA,1
 2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,2840500,14.85949065097932,TRUE,Semi-Senior,5,0,0,0,Sin equipo,Contractor,Remoto,101-200,Hombre,35,Posgrado/Especialización,Interior,1
@@ -10772,7 +10762,6 @@ anio,semestre,periodo,trabajo_de,grupo_rol,dedicacion,sal_bruto,log_sal,sueldo_d
 2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,1614155,14.294322157897401,FALSE,Senior,8,18,8,0,Sin equipo,Staff,Hibrido,+10000,Hombre,40,Posgrado/Especialización,CABA,0
 2024,1,2024.1,Data Scientist,Data Science / AI,Full-Time,2400000,14.690979295318174,FALSE,Semi-Senior,4,1,1,0,Sin equipo,Staff,Remoto,101-200,Hombre,42,NA,Interior,5
 2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,740000,13.514405465180353,FALSE,Senior,7,3,2,1,Equipo pequeño,Staff,Hibrido,2-10,Hombre,34,Universitario,Interior,3
-2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,1700000,14.346138809026444,FALSE,Senior,15,1,1,0,Sin equipo,Staff,Hibrido,501-1000,Hombre,388,NA,CABA,1
 2024,1,2024.1,Infosec,Governance / Security,Full-Time,1816940,14.412664325369136,FALSE,Semi-Senior,4,1,1,0,Sin equipo,Staff,Remoto,201-500,Hombre,30,Universitario,Interior,3
 2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,1300000,14.077874822431765,FALSE,Senior,10,4,3,2,Equipo pequeño,Staff,Presencial,501-1000,Hombre,34,Terciario,Interior,2
 2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,950000,13.764217263576723,FALSE,Semi-Senior,3,3,3,1,Equipo pequeño,Staff,Hibrido,101-200,Hombre,28,Universitario,CABA,3
@@ -11178,7 +11167,6 @@ anio,semestre,periodo,trabajo_de,grupo_rol,dedicacion,sal_bruto,log_sal,sueldo_d
 2024,1,2024.1,Functional Analyst,Analytics / Automation,Full-Time,1060140,13.87391153283875,FALSE,Junior,2,8,2,0,Sin equipo,Staff,Hibrido,51-100,Hombre,31,NA,CABA,0
 2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,3600000,15.096444403426338,FALSE,Senior,17,4,4,0,Sin equipo,Staff,Remoto,5001-10000,Hombre,37,NA,CABA,0
 2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,2100000,14.557447902693651,FALSE,Senior,32,26,14,4,Equipo pequeño,Staff,Presencial,+10000,Hombre,48,Terciario,Interior,0
-2024,1,2024.1,Data Scientist,Data Science / AI,Part-Time,1450000,14.187074114396758,FALSE,Senior,7,0,2,0,Sin equipo,Freelance,Remoto,2-10,Hombre,999,Posgrado/Especialización,CABA,0
 2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,2116000,14.565038071960327,FALSE,Senior,9,3,3,0,Sin equipo,Staff,Hibrido,11-50,Hombre,33,NA,CABA,3
 2024,1,2024.1,BI Analyst / Data Analyst,Data Science / AI,Full-Time,3790000,15.147876577058609,FALSE,Senior,20,5,3,0,Sin equipo,Staff,Remoto,+10000,Hombre,47,NA,CABA,2
 2024,1,2024.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,1897754,14.456181639635982,FALSE,Semi-Senior,5,1,1,0,Sin equipo,Staff,Hibrido,101-200,Hombre,28,NA,CABA,3
@@ -12632,7 +12620,6 @@ anio,semestre,periodo,trabajo_de,grupo_rol,dedicacion,sal_bruto,log_sal,sueldo_d
 2025,1,2025.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,1500000,14.22097566607244,FALSE,Semi-Senior,3,3,3,0,Sin equipo,Staff,Hibrido,11-50,Hombre,36,Universitario,Interior,5
 2025,1,2025.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,1000100,13.815610552964607,FALSE,Senior,6,5,2,0,Sin equipo,Staff,Presencial,101-200,Mujer,45,Universitario,GBA / Prov. BA,2
 2025,1,2025.1,Business Analyst,Analytics / Automation,Full-Time,2400000,14.690979295318174,FALSE,Senior,15,0,10,0,Sin equipo,Staff,Hibrido,51-100,Mujer,41,Universitario,CABA,1
-2025,1,2025.1,Business Analyst,Analytics / Automation,Full-Time,3000000,14.914122846632385,FALSE,Senior,13,3,3,0,Sin equipo,Staff,Hibrido,2001-5000,Hombre,354,NA,CABA,2
 2025,1,2025.1,BI Analyst / Data Analyst,Data Science / AI,Full-Time,1796081.46,14.401117883163153,FALSE,Semi-Senior,3,1,3,0,Sin equipo,Staff,Remoto,201-500,Mujer,31,Universitario,Interior,4
 2025,1,2025.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,3000000,14.914122846632385,FALSE,Senior,6,2,1,5,Equipo mediano,Staff,Hibrido,201-500,Hombre,34,NA,Interior,1
 2025,1,2025.1,BI Analyst / Data Analyst,Data Science / AI,Full-Time,1800000,14.403297222866392,FALSE,Semi-Senior,5,4,3,0,Sin equipo,Staff,Remoto,5001-10000,Hombre,47,Posgrado/Especialización,CABA,4
@@ -14281,7 +14268,6 @@ anio,semestre,periodo,trabajo_de,grupo_rol,dedicacion,sal_bruto,log_sal,sueldo_d
 2026,1,2026.1,BI Analyst / Data Analyst,Data Science / AI,Full-Time,2400000,14.690979295318174,TRUE,Semi-Senior,3,0,3,0,Sin equipo,Staff,Remoto,201-500,Hombre,33,NA,Interior,5
 2026,1,2026.1,AI Engineer,Data Science / AI,Full-Time,2650000,14.790070197962406,TRUE,Senior,8,0,0,0,Sin equipo,Contractor,Remoto,2001-5000,Hombre,31,NA,GBA / Prov. BA,3
 2026,1,2026.1,Data Engineer,Data Science / AI,Full-Time,5300000,15.483217378522351,TRUE,Senior,10,2,2,0,Sin equipo,Contractor,Remoto,+10000,Hombre,37,NA,Interior,5
-2026,1,2026.1,Infosec,Governance / Security,Full-Time,7200000,15.789591583986283,TRUE,Senior,12,5,3,0,Sin equipo,Contractor,Remoto,201-500,Otro/No binarie,99,NA,GBA / Prov. BA,5
 2026,1,2026.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,7000000,15.761420707019587,TRUE,Semi-Senior,4,1,3,0,Sin equipo,Tercerizado,Remoto,11-50,Hombre,30,Terciario,CABA,5
 2026,1,2026.1,Data Scientist,Data Science / AI,Full-Time,8000000,15.89495209964411,TRUE,Senior,15,1,6,7,Equipo mediano,Freelance,Remoto,2-10,Hombre,45,NA,GBA / Prov. BA,5
 2026,1,2026.1,AI Engineer,Data Science / AI,Full-Time,4350000,15.285686403064867,TRUE,Junior,2,0,0,0,Sin equipo,Staff,Remoto,201-500,Hombre,26,NA,CABA,5
@@ -14313,7 +14299,6 @@ anio,semestre,periodo,trabajo_de,grupo_rol,dedicacion,sal_bruto,log_sal,sueldo_d
 2026,1,2026.1,BI Analyst / Data Analyst,Data Science / AI,Full-Time,1785000,14.394928973195876,TRUE,Junior,0,0,0,0,Sin equipo,Contractor,Hibrido,2-10,Mujer,21,NA,CABA,3
 2026,1,2026.1,Data Engineer,Data Science / AI,Full-Time,6000000,15.60727002719233,TRUE,Senior,12,1,2,0,Sin equipo,Contractor,Remoto,1001-2000,Hombre,39,NA,CABA,5
 2026,1,2026.1,AI Engineer,Data Science / AI,Full-Time,2940000,14.893920139314865,TRUE,Junior,1,0,0,0,Sin equipo,Contractor,Remoto,51-100,Hombre,25,Universitario,GBA / Prov. BA,5
-2026,1,2026.1,Infrasctruture Engineer,Data Platform / MLOps,Full-Time,1000000,13.815510557964274,TRUE,Senior,10,5,5,0,Sin equipo,Staff,Remoto,51-100,Hombre,37,NA,Interior,4
 2026,1,2026.1,Data Scientist,Data Science / AI,Full-Time,3500000,15.068273526459642,TRUE,Senior,10,2,2,0,Sin equipo,Staff,Remoto,201-500,Mujer,45,Doctorado,GBA / Prov. BA,3
 2026,1,2026.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,7450000,15.823724590355742,TRUE,Senior,27,4,4,3,Equipo pequeño,Contractor,Remoto,101-200,Hombre,46,NA,GBA / Prov. BA,2
 2026,1,2026.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,3012048,14.918130804029921,TRUE,Semi-Senior,3,3,3,0,Sin equipo,Staff,Hibrido,11-50,Hombre,41,Terciario,CABA,5
@@ -15031,7 +15016,6 @@ anio,semestre,periodo,trabajo_de,grupo_rol,dedicacion,sal_bruto,log_sal,sueldo_d
 2026,1,2026.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,2425000,14.70134208235372,FALSE,Senior,17,0,13,0,Sin equipo,Contractor,Hibrido,1001-2000,Hombre,36,Secundario,CABA,2
 2026,1,2026.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,1450000,14.187074114396758,FALSE,Junior,2,0,2,0,Sin equipo,Contractor,Hibrido,5001-10000,Hombre,26,NA,CABA,2
 2026,1,2026.1,Data Engineer,Data Science / AI,Full-Time,5000000,15.424948470398375,FALSE,Senior,8,4,4,0,Sin equipo,Staff,Remoto,101-200,Hombre,32,NA,CABA,5
-2026,1,2026.1,Data Engineer,Data Science / AI,Full-Time,2500000,14.73180128983843,FALSE,Senior,40,10,10,0,Sin equipo,Staff,Hibrido,501-1000,Hombre,73,NA,CABA,3
 2026,1,2026.1,DBA,Data Platform / MLOps,Full-Time,5200000,15.464169183551656,FALSE,Junior,2,5,0,0,Sin equipo,Staff,Remoto,2001-5000,Hombre,36,NA,CABA,4
 2026,1,2026.1,SysAdmin / DevOps / SRE,Data Platform / MLOps,Full-Time,2573300,14.760699679881078,FALSE,Senior,7,7,2,2,Equipo pequeño,Staff,Hibrido,1001-2000,Otro/No binarie,27,NA,CABA,5
 2026,1,2026.1,BI Analyst / Data Analyst,Data Science / AI,Full-Time,3650000,15.110237725558674,FALSE,Semi-Senior,4,2,2,0,Sin equipo,Staff,Hibrido,201-500,Hombre,24,Universitario,CABA,2

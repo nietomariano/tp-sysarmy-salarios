@@ -74,7 +74,6 @@ df %>%
 # Por lo tanto, los valores faltantes responden a cambios en el
 # cuestionario de Sysarmy entre distintos períodos y no a errores
 # de carga o falta de respuesta de los encuestados.
-# Buscamos a que periodos pertenecen los N/A o la mayor cantidad
 
 
 
@@ -84,33 +83,50 @@ df %>%
 
 # Variables categóricas
 
+# grupo_rol — Data Platform / MLOps representa el 50% del dataset
 df %>%
   count(grupo_rol)
 
+# Distribución de seniority — 66.7% NA corresponden a períodos 2019-2023
 df %>%
   count(seniority)
 
+# genero_simple — 82% Hombre, representación femenina baja (14%)
 df %>%
   count(genero_simple)
 
+# modalidad — 46% NA (períodos pre-2022); entre los disponibles, 50% remoto
 df %>%
   count(modalidad)
 
+# gente_a_cargo_grupo — 80% sin equipo a cargo
 df %>%
   count(gente_a_cargo_grupo)
+
 
 
 # Variables numericas
 
 
+# sal_bruto: media (1.049.037) muy superior a mediana (270.000)
+# la mayoría de las personas gana bastante menos de $1 millon
+# existe un grupo relativamente pequeño con salarios muy altos
+# esos salarios altos empujan la media hacia arriba
+
+# — distribución asimétrica, confirma uso de log_sal para el modelado
 summary(df$sal_bruto)
 
+# log_sal: distribución más simétrica tras transformación logarítmica
 summary(df$log_sal)
 
+# experiencia: máximo de 65 años, posible outlier a revisar
 summary(df$experiencia)
 
+# edad: rango 17-70, sin valores corruptos. 5 NAs — se mantienen, 
+# son pocos y no afectan el análisis
 summary(df$edad)
 
+# gente_a_cargo: mediana 0, 75% sin equipo — distribución muy sesgada
 summary(df$gente_a_cargo)
 
 

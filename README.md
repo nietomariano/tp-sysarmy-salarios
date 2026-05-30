@@ -112,6 +112,7 @@ Las encuestas utilizadas fueron obtenidas de las publicaciones públicas de Sysa
 https://sueldos.openqube.io/encuesta-sueldos-2026.01/
 https://sysarmy.com/
 
+
 ---
 
 ## Variables analizadas
@@ -130,6 +131,20 @@ Entre las principales variables utilizadas se encuentran:
 * Personas a cargo
 * Región
 * Nivel de estudios
+
+---
+
+## Calidad de los datos
+
+La calidad general de los datos es buena. Las variables principales
+utilizadas para el modelado (salario, experiencia, antiguedad, rol,
+genero y region) no presentan valores faltantes.
+Se detectan faltantes importantes en seniority, sueldo_dolarizado y
+uso_ia (66,7% de las observaciones), lo que sugiere que estas variables
+fueron incorporadas en versiones más recientes de la encuesta.
+Debido a esto, se evaluara la construcción de modelos alternativos:
+uno utilizando la totalidad de las observaciones y otro restringido a
+los períodos donde dichas variables estan disponibles.
 
 ---
 

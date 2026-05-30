@@ -137,10 +137,7 @@ Entre las principales variables utilizadas se encuentran:
 
 * R
 * tidyverse
-* readr
-* dplyr
-* purrr
-* ggplot2
+* ggplot
 * Git
 * GitHub
 

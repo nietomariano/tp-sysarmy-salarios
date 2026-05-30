@@ -108,4 +108,4 @@ Entre las principales variables utilizadas se encuentran:
 
 * Valle Candela
 * Aguirre Santiago
-* * Mariano Nieto
+* Mariano Nieto

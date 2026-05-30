@@ -22,26 +22,20 @@ library(tidyverse)
 # -----------------------------------------------------------------------------
 
 df <- read_csv(
-  "data/processed/df_sysarmy.csv",
-  show_col_types = FALSE
-)
+  "data/processed/df_sysarmy.csv")
 
 # -----------------------------------------------------------------------------
 # 2. ESTRUCTURA GENERAL
 # -----------------------------------------------------------------------------
 
 glimpse(df)
-
 dim(df)
-
 colnames(df)
-
-
-
 
 # -----------------------------------------------------------------------------
 # 3. CALIDAD DE DATOS
 # -----------------------------------------------------------------------------
+
 
 colSums(is.na(df))
 sort(colSums(is.na(df)), decreasing = TRUE)
@@ -60,16 +54,16 @@ df %>%
 
 
 # CONCLUSION:
-# Las variables principales utilizadas para el análisis no presentan
+# Las variables PRINCIPALES utilizadas para el analisis no presentan
 # valores faltantes.
 #
-# Seniority, sueldo_dolarizado y uso_ia presentan aproximadamente
-# un 67% de valores faltantes. Sin embargo, el analisis por períodos
-# nos muestra que estos faltantes no son aleatorios.
+# Seniority, sueldo_dolarizado y uso_ia representan aproximadamente
+# un 67% de valores faltantes. Sin embargo, en el ultimo analisis que hicimos
+# (por periodos) nos muestra que estos faltantes no son aleatorios.
 #
-# Las variables seniority y sueldo_dolarizado se encuentran
+# Las variables seniority, sueldo_dolarizado y uso_ia se encuentran
 # disponibles a partir de la encuesta del periodo 2024.1,
-# mientras que uso_ia aparece a partir de 2022.2.
+# mientras que modalidad aparece a partir de 2022.2.
 #
 # Por lo tanto, los valores faltantes responden a cambios en el
 # cuestionario de Sysarmy entre distintos períodos y no a errores
@@ -81,52 +75,61 @@ df %>%
 # 4. DISTRIBUCIONES UNIVARIADAS
 # -----------------------------------------------------------------------------
 
-# Variables categóricas
+### VARIABLES CATEGORICAS
 
-# grupo_rol — Data Platform / MLOps representa el 50% del dataset
+# grupo_rol — "Data Platform / MLOps" representa el ~50% del dataset.
 df %>%
-  count(grupo_rol)
+  count(grupo_rol)%>%
+  mutate(
+    porcentaje = round(n/sum(n)*100,1)
+  )
 
-# Distribución de seniority — 66.7% NA corresponden a períodos 2019-2023
+# Distribución de seniority — Nota: ~67% NA corresponden a períodos 2019-2023
 df %>%
-  count(seniority)
+  count(seniority)%>%
+  mutate(
+    porcentaje = round(n/sum(n)*100,1)
+  )
 
-# genero_simple — 82% Hombre, representación femenina baja (14%)
+# genero_simple — Nota: ~82% Hombre, representación femenina baja (14%)
 df %>%
-  count(genero_simple)
+  count(genero_simple)%>%
+  mutate(
+    porcentaje = round(n/sum(n)*100,1)
+  )
 
-# modalidad — 46% NA (períodos pre-2022); entre los disponibles, 50% remoto
+# modalidad — Nota: ~46% NA (períodos pre-2022); entre los disponibles, 50% remoto
 df %>%
-  count(modalidad)
+  count(modalidad)%>%
+  mutate(
+    porcentaje = round(n/sum(n)*100,1)
+  )
 
-# gente_a_cargo_grupo — 80% sin equipo a cargo
+# gente_a_cargo_grupo — Nota: ~80% sin equipo a cargo
 df %>%
-  count(gente_a_cargo_grupo)
+  count(gente_a_cargo_grupo)%>%
+  mutate(
+    porcentaje = round(n/sum(n)*100,1)
+  )
 
 
+### VARIABLES NUMERICAS
 
-# Variables numericas
 
-
-# sal_bruto: media (1.049.037) muy superior a mediana (270.000)
-# la mayoría de las personas gana bastante menos de $1 millon
-# existe un grupo relativamente pequeño con salarios muy altos
-# esos salarios altos empujan la media hacia arriba
-
-# — distribución asimétrica, confirma uso de log_sal para el modelado
+# sal_bruto: media (1.049.037) - mediana (270.000) — distribucion asimetrica
+# confirma uso de log_sal como variable objetivo
 summary(df$sal_bruto)
 
-# log_sal: distribución más simétrica tras transformación logarítmica
+# log_sal: media (12.74) y mediana (12.51) mas cercanas - buen uso de log()
 summary(df$log_sal)
 
-# experiencia: máximo de 65 años, posible outlier a revisar
+# experiencia: mediana 6 anios, máximo 65 — posible outlier en el maximo
 summary(df$experiencia)
 
-# edad: rango 17-70, sin valores corruptos. 5 NAs — se mantienen, 
-# son pocos y no afectan el análisis
+# edad: rango 17-70, 5 NA — no afectan el analisis
 summary(df$edad)
 
-# gente_a_cargo: mediana 0, 75% sin equipo — distribución muy sesgada
+# gente_a_cargo: mediana 0, media 0.74 — 80% sin equipo, distribucion muy sesgada
 summary(df$gente_a_cargo)
 
 
@@ -144,7 +147,7 @@ summary(df$gente_a_cargo)
     ) +
     labs(
       title = "Distribución del salario bruto",
-      x = "salario bruto",
+      x = "Salario bruto (ARS)",
       y = "Frecuencia"
     ) +
     theme_minimal()
@@ -165,18 +168,21 @@ ggplot(df, aes(x = log_sal)) +
   theme_minimal()
 
 
-
+# Histograma con densidad — linea roja muestra curva de densidad estimada
+# Grafico principal de esta seccion — se observa distribución bimodal
+# Dos picos sugieren dos grupos salariales distintos (pesos vs dolares)
 ggplot(df, aes(x = log_sal)) +
   geom_histogram(
     aes(y = after_stat(density)),
-    bins = 30, fill = "steelblue", color = "black", alpha = 0.6
+    bins = 40, fill = "steelblue",color = "white"
   ) +
   geom_density(color = "red", size = 1) +
   labs(
     title = "Distribución de log_sal con curva de densidad",
     x = "Logaritmo del salario",
     y = "Densidad"
-  )
+  )+
+  theme_minimal()
 
 
 ggplot(df, aes(y = log_sal)) +
@@ -201,7 +207,8 @@ ggplot(df, aes(x = experiencia, y = log_sal)) +
     title = "Salario vs experiencia",
     x = "Años de experiencia",
     y = "Logaritmo del salario"
-  )
+  )+
+  theme_minimal()
 
 
 # Edad vs salario
@@ -213,7 +220,8 @@ ggplot(df, aes(x = edad, y = log_sal)) +
     title = "Salario vs edad",
     x = "Edad",
     y = "Logaritmo del salario"
-  )
+  )+
+  theme_minimal()
 
 
 # Personas a cargo vs salario
@@ -225,7 +233,8 @@ ggplot(df, aes(x = gente_a_cargo, y = log_sal)) +
     title = "Salario vs personas a cargo",
     x = "Personas a cargo",
     y = "Logaritmo del salario"
-  )
+  )+
+  theme_minimal()
 
 
 
@@ -238,7 +247,8 @@ ggplot(df, aes(x = factor(gente_a_cargo_grupo,
     title = "Salario según personas a cargo",
     x = "Grupo de personas a cargo",
     y = "Logaritmo del salario"
-  )
+  )+
+  theme_minimal()
 
 
 
@@ -254,7 +264,7 @@ ggplot(df, aes(x = factor(gente_a_cargo_grupo,
 # SENIORITY
 
 # Filtramos NA porque no aporta al grafico y mejoramos la visual.
-# Con caption hacemos aclaracion del filtro ( Check List)
+# Con caption hacemos aclaracion de filtros aplicados (Check List)
 
 ggplot(df %>% filter(!is.na(seniority)), 
        aes(x = seniority, y = log_sal, fill = seniority)) +
@@ -265,8 +275,9 @@ ggplot(df %>% filter(!is.na(seniority)),
     y = "Logaritmo del salario bruto (log)",
     caption = "Solo períodos 2024-2026 | n = 5.091 observaciones"
   ) +
-  theme_minimal() +
-  theme(legend.position = "none")
+  theme(legend.position = "none")+
+  +
+  theme_minimal()
 
 
 # MODALIDAD
@@ -284,8 +295,8 @@ ggplot(df %>% filter(!is.na(modalidad)),
     y = "Logaritmo del salario bruto (log)",
     caption = "Períodos 2019-2022 | n = 8.195 observaciones"
   ) +
-  theme_minimal() +
-  theme(legend.position = "none")
+  theme(legend.position = "none")+
+  theme_minimal()
 
 
 # SUELDO SEGUN DOLARIZACION
@@ -307,8 +318,20 @@ ggplot(df %>% filter(!is.na(sueldo_dolarizado)),
     y = "Logaritmo del salario bruto (log)",
     caption = "Solo períodos 2024-2026 | n = 5.091 observaciones"
   ) +
-  theme_minimal() +
-  theme(legend.position = "none")
+  theme(legend.position = "none")+
+  theme_minimal()
+
+# Tabla de apoyo para visualizar mediana de log_sal segun sueldo dolarizado TRUE o FALSE
+
+df %>%
+  filter(!is.na(sueldo_dolarizado)) %>%
+  group_by(sueldo_dolarizado) %>%
+  summarise(
+    mediana = median(log_sal, na.rm = TRUE),
+    mediana_pesos = median(sal_bruto, na.rm = TRUE),
+    n = n()
+  )
+
 
 # SUELDO DOLARIZADO: Experiencia vs Salario segun dolarizacion
 # SIN N/A, aclaramos con caption
@@ -349,8 +372,8 @@ ggplot(df,
     x = "Tamaño del equipo a cargo",
     y = "Logaritmo del salario bruto (log)"
   ) +
-  theme_minimal() +
-  theme(legend.position = "none")
+  theme(legend.position = "none")+
+  theme_minimal()
 
 
 
@@ -375,11 +398,11 @@ ggplot(df %>% filter(!is.na(tam_empresa)),
     x = "Cantidad de personas en la organización",
     y = "Logaritmo del salario bruto (log)"
   ) +
-  theme_minimal() +
   theme(
     legend.position = "none",
     axis.text.x = element_text(angle = 45, hjust = 1)
-  )
+  )+
+  theme_minimal()
 
 
 
@@ -435,8 +458,8 @@ ggplot(df,
     x = "Género",
     y = "Logaritmo del salario bruto (log)"
   ) +
-  theme_minimal() +
-  theme(legend.position = "none")
+  theme(legend.position = "none")+
+  theme_minimal()
 
 
 
@@ -501,8 +524,8 @@ ggplot(df,
     x = "Región",
     y = "Logaritmo del salario bruto (log)"
   ) +
-  theme_minimal() +
-  theme(legend.position = "none")
+  theme(legend.position = "none")+
+  theme_minimal()
 
 
 # Observamos cantidad de observaciones en GBA para descartar errores
@@ -522,11 +545,11 @@ ggplot(df,
     x = "Grupo de rol",
     y = "Logaritmo del salario bruto (log)"
   ) +
-  theme_minimal() +
   theme(
     legend.position = "none",
     axis.text.x = element_text(angle = 15, hjust = 1)
-  )
+  )+
+  theme_minimal()
 
 
 # Top roles individuales — salario por ocupación

@@ -485,8 +485,7 @@ ggplot(df %>% filter(!is.na(seniority)),
   theme_minimal()
 
 
-# Tabla de apoyo
-
+# Tabla de Apoyo - Mediana de salario por grupo_rol
 df %>%
   group_by(grupo_rol) %>%
   summarise(
@@ -496,17 +495,23 @@ df %>%
   arrange(desc(mediana_salario))
 
 
+# CONCLUSION SECCION 8:
+# El genero no es un determinante salarial independiente.
+# Seniority actua como variable confundidora — hombres Senior ~50%  vs 
+# mujeres Senior ~30%.
+# Al controlar por seniority, las diferencias salariales entre generos desaparecen.
 
-# OBSERVACIONES: 
 
 # -----------------------------------------------------------------------------
 # 9. REGIONES Y ROLES
 # -----------------------------------------------------------------------------
 
-# Salario según región
-# Grafico región — GBA/Prov. BA tiene una caja muy compacta y alta. 
-
-
+# SALARIO SEGUN REGION
+# GBA tiene mediana mas alta y distribucion más compacta que CABA e Interior
+# Posiblemente esto refleje profesionales remotos trabajando para empresas 
+# de CABA.
+# CABA e Interior tienen medianas similares pero mayor dispersion
+# Observaciones: CABA=8.461, GBA=915, Interior=5.912
 ggplot(df,
        aes(x = region, y = log_sal, fill = region)) +
   geom_boxplot() +
@@ -515,19 +520,16 @@ ggplot(df,
     x = "Región",
     y = "Logaritmo del salario bruto (log)"
   ) +
-  theme(legend.position = "none")+
   theme_minimal()
 
-
-# Observamos cantidad de observaciones en GBA para descartar errores
-# 915 observaciones son suficientes para comparar
-# los salarios en GBA están más concentrados en un rango alto con poca dispersion.
 df %>% count(region)
 
 
 
-
-# Salario según grupo de rol
+# SALARIO SEGUN GRUPO DE ROL
+# Data Science / AI tiene la mediana mas alta — Data Platform / MLOps la 
+# mas baja
+# Diferencias entre grupos menores de lo esperado — medianas similares
 ggplot(df,
        aes(x = grupo_rol, y = log_sal, fill = grupo_rol)) +
   geom_boxplot() +
@@ -543,7 +545,11 @@ ggplot(df,
   theme_minimal()
 
 
-# Top roles individuales — salario por ocupación
+# TOP DE ROLES CON FILL POR GRUPO — salario por ocupación
+# Entre los puestos AI Engineer tiene la mediana mas alta - DBA la mas baja 
+# Alta variabilidad dentro de cada grupo de rol
+# El puesto (rol) es una etiqueta — seniority y dolarización
+# determinan el salario independientemente del puesto especifico
 top_roles <- df %>%
   count(trabajo_de, sort = TRUE) %>%
   slice_head(n = 10) %>%
@@ -564,9 +570,33 @@ ggplot(df %>% filter(trabajo_de %in% top_roles),
   theme_minimal()
 
 
+# CONCLUSION SECCION 9:
+# Las diferencias regionales son menores de lo esperado — mercado IT relativamente homogeneo.
+# Entre roles, AI Engineer lidera y DBA queda en el extremo inferior.
+# Grupo de rol y region pueden ser variables de control en el modelado.
+
+
 # -----------------------------------------------------------------------------
 # 10. CONCLUSIONES DEL EDA
 # -----------------------------------------------------------------------------
 
 
-# Principales hallazgos:
+# VARIABLES CON MAYOR PODER EXPLICATIVO:
+# - Seniority: separación clara entre niveles, mayor señal del EDA
+# - Dolarización: brecha del 34% en salario bruto, confirma bimodalidad
+# - Experiencia: relación positiva pero con alta dispersión
+# - Grupo de rol: Data Science / AI lidera, diferencias moderadas
+
+# VARIABLES CON MENOR PODER EXPLICATIVO:
+# - Modalidad: medianas similares entre remoto, híbrido y presencial
+# - Tamaño de empresa: sin tendencia clara ni consistente
+# - Región: mercado IT relativamente homogéneo geográficamente
+
+# VARIABLE CONFUNDIDORA IDENTIFICADA:
+# - Seniority confunde la relación género-salario
+# - Al controlar por seniority, diferencias entre géneros desaparecen
+
+# DECISIÓN DE MODELADO:
+# - Modelo 1: datos completos 2019-2026, sin seniority ni dolarización
+# - Modelo 2: datos 2024-2026, incorpora seniority y dolarización
+# - Comparación mediante ANOVA

@@ -18,8 +18,7 @@ Se consolidaron múltiples ediciones semestrales de la encuesta (2019–2026), c
 
 ## Pregunta de investigación
 
-¿Qué factores explican mejor las diferencias salariales entre los profesionales del área de datos en Argentina?
-
+¿Qué variables — experiencia, seniority o dolarización del sueldo — tienen mayor capacidad explicativa sobre los salarios de los profesionales de datos en Argentina durante el período 2019-2026?
 
 ## Hipótesis
 
@@ -32,6 +31,8 @@ H3. Los profesionales con salario dolarizado perciben mayores ingresos.
 H4. Existen diferencias salariales entre los distintos grupos de roles.
 
 H5. Las personas con personal a cargo perciben salarios superiores.
+
+H6. La modalidad de trabajo (remoto, híbrido, presencial) no tiene efecto significativo sobre el salario.
 
 
 ## Variable objetivo
@@ -152,6 +153,7 @@ los períodos donde dichas variables estan disponibles.
 
 * R
 * tidyverse
+* janitor
 * ggplot
 * Git
 * GitHub

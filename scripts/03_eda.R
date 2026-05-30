@@ -198,61 +198,78 @@ ggplot(df, aes(y = log_sal)) +
 # 6. VARIABLES NUMERICAS
 # -----------------------------------------------------------------------------
 
-# Experiencia vs salario
 
+# Relacion entre Experiencia y salario
+# Relacion positiva debil — experiencia sola no determina el salario
+# Alta dispersion vertical
+# La mayoria de observaciones se encuentran entre 0 y 20 anios de experiencia
 ggplot(df, aes(x = experiencia, y = log_sal)) +
   geom_jitter(alpha = 0.5, color = "darkgreen") +
   geom_smooth(method = "lm", color = "red") +
   labs(
-    title = "Salario vs experiencia",
+    title = "Relación entre experiencia y salario",
     x = "Años de experiencia",
-    y = "Logaritmo del salario"
+    y = "Logaritmo del salario bruto (log)",
+    caption = "Línea roja: ajuste lineal"
   )+
   theme_minimal()
 
 
-# Edad vs salario
 
+# Relacion entre Edad y salario
+# Tendencia positiva similar a experiencia pero con mayor dispersion
+# Edad y experiencia probablemente correlacionadas — riesgo de multicolinealidad
+# Se evaluara incluir solo una de las dos en el modelo final
 ggplot(df, aes(x = edad, y = log_sal)) +
   geom_jitter(alpha = 0.5, color = "darkblue") +
   geom_smooth(method = "lm", color = "red") +
   labs(
-    title = "Salario vs edad",
-    x = "Edad",
-    y = "Logaritmo del salario"
-  )+
+    title = "Relación entre edad y salario",
+    x = "Edad (años)",
+    y = "Logaritmo del salario bruto (log)",
+    caption = "Línea roja: ajuste lineal"
+  ) +
   theme_minimal()
 
 
-# Personas a cargo vs salario
-
+# Relacion entre Personas a cargo y salario
+# 80% de observaciones en x=0 — ajuste lineal poco confiable
+# Zona gris del lm se abre hacia la derecha por escasez de datos en valores altos
+# El boxplot por grupos probablemente sea mas informativo para esta variable
 ggplot(df, aes(x = gente_a_cargo, y = log_sal)) +
   geom_jitter(alpha = 0.5, color = "purple") +
   geom_smooth(method = "lm") +
   labs(
-    title = "Salario vs personas a cargo",
-    x = "Personas a cargo",
-    y = "Logaritmo del salario"
-  )+
+    title = "Relación entre personas a cargo y salario",
+    x = "Cantidad de personas a cargo",
+    y = "Logaritmo del salario bruto (log)",
+    caption = "Línea roja: ajuste lineal | Zona gris: margen de incertidumbre"
+  ) +
   theme_minimal()
 
-
-
+# Relacion entre Grupo de personas a cargo y salario
+# Mediana salarial aumenta progresivamente con el tamaño del equipo
+# Cajas de tamaño similar — dispersion parecida entre los grupos
+# Equipo grande tiene pocos casos
 ggplot(df, aes(x = factor(gente_a_cargo_grupo, 
                            levels = c("Sin equipo","Equipo pequeño",
                                       "Equipo mediano","Equipo grande")), 
                 y = log_sal)) +
   geom_boxplot(fill = "lightblue") +
   labs(
-    title = "Salario según personas a cargo",
-    x = "Grupo de personas a cargo",
-    y = "Logaritmo del salario"
+    title = "Distribución salarial según tamaño del equipo a cargo",
+    x = "Tamaño del equipo a cargo",
+    y = "Logaritmo del salario bruto (log)"
   )+
   theme_minimal()
 
 
 
-# Observaciones:
+# CONCLUSION SECCION 6:
+# Las tres variables numericas muestran relacion positiva con el salario
+# pero con alta dispersion — ninguna explica el salario de forma aislada.
+# Edad y experiencia probablemente correlacionadas — evaluar multicolinealidad.
+
 
 
 
@@ -262,10 +279,9 @@ ggplot(df, aes(x = factor(gente_a_cargo_grupo,
 
 
 # SENIORITY
-
-# Filtramos NA porque no aporta al grafico y mejoramos la visual.
-# Con caption hacemos aclaracion de filtros aplicados (Check List)
-
+# Variable con separación clara entre los tres niveles
+# Medianas crecen progresivamente: Junior < Semi-Senior < Senior
+# Senior tiene levemente la caja con mayor dispersión
 ggplot(df %>% filter(!is.na(seniority)), 
        aes(x = seniority, y = log_sal, fill = seniority)) +
   geom_boxplot() +
@@ -274,17 +290,14 @@ ggplot(df %>% filter(!is.na(seniority)),
     x = "Seniority",
     y = "Logaritmo del salario bruto (log)",
     caption = "Solo períodos 2024-2026 | n = 5.091 observaciones"
-  ) +
-  theme(legend.position = "none")+
-  +
+  )+
   theme_minimal()
 
 
 # MODALIDAD
-
-# Filtramos NA porque no aporta al grafico y mejoramos la visual.
-# Con caption hacemos aclaracion del filtro ( Check List)
-
+# Presencial muestra mediana levemente inferior y menor dispersión
+# Medianas similares entre Remoto e Hibrido
+# Modalidad no pareciera ser un determinante relevante del salario
 
 ggplot(df %>% filter(!is.na(modalidad)),
        aes(x = modalidad, y = log_sal, fill = modalidad)) +
@@ -295,16 +308,13 @@ ggplot(df %>% filter(!is.na(modalidad)),
     y = "Logaritmo del salario bruto (log)",
     caption = "Períodos 2019-2022 | n = 8.195 observaciones"
   ) +
-  theme(legend.position = "none")+
   theme_minimal()
 
 
-# SUELDO SEGUN DOLARIZACION
-
-# Filtramos NA porque no aporta al grafico y mejoramos la visual.
-# Con caption hacemos aclaracion del filtro ( Check List)
-
-
+# DOLARIZACION
+# Diferencia salarial mas pronunciada de todas las variables categóricas
+# Dolarizado: mediana 14.9 ($2.916.000) vs No dolarizado: 14.6 ($2.180.000)
+# Confirma hipotesis de bimodalidad observada en sección 5
 
 ggplot(df %>% filter(!is.na(sueldo_dolarizado)),
        aes(x = factor(sueldo_dolarizado, 
@@ -318,10 +328,10 @@ ggplot(df %>% filter(!is.na(sueldo_dolarizado)),
     y = "Logaritmo del salario bruto (log)",
     caption = "Solo períodos 2024-2026 | n = 5.091 observaciones"
   ) +
-  theme(legend.position = "none")+
   theme_minimal()
 
-# Tabla de apoyo para visualizar mediana de log_sal segun sueldo dolarizado TRUE o FALSE
+# Tabla de apoyo para visualizar mediana de log_sal segun sueldo dolarizado 
+# TRUE o FALSE
 
 df %>%
   filter(!is.na(sueldo_dolarizado)) %>%
@@ -333,9 +343,11 @@ df %>%
   )
 
 
-# SUELDO DOLARIZADO: Experiencia vs Salario segun dolarizacion
-# SIN N/A, aclaramos con caption
-
+# RELACION ENTRE EXPERIENCIA y SALARIO SEGUN DOLARIZACION
+# Brecha salarial entre dolarizados y no dolarizados se mantiene en toda 
+# la trayectoria
+# Las líneas no son paralelas — brecha crece levemente con la experiencia
+# Dolarizar el sueldo tiene mayor impacto salarial a largo plazo
 
 ggplot(df %>% filter(!is.na(sueldo_dolarizado)),
        aes(x = experiencia, 
@@ -355,35 +367,10 @@ ggplot(df %>% filter(!is.na(sueldo_dolarizado)),
 
 
 
-#  Observacionn: 
-
-# PERSONAS A CARGO
-
-
-ggplot(df,
-       aes(x = factor(gente_a_cargo_grupo,
-                      levels = c("Sin equipo", "Equipo pequeño",
-                                 "Equipo mediano", "Equipo grande")),
-           y = log_sal,
-           fill = gente_a_cargo_grupo)) +
-  geom_boxplot() +
-  labs(
-    title = "Distribución salarial según tamaño del equipo a cargo",
-    x = "Tamaño del equipo a cargo",
-    y = "Logaritmo del salario bruto (log)"
-  ) +
-  theme(legend.position = "none")+
-  theme_minimal()
-
-
-
-# OBSERVACIONES: 
-
-
-
 # TAMANO DE LA EMPRESA
-# forzamos el orden de los datos en el eje x porque ordena alfabeticamente  las categorias y queda desordenado #.
-
+# Medianas similares entre todos los tamaños — sin tendencia clara ni consistente
+# Leve variacion en tramos intermedios pero se estabiliza en empresas grandes
+# Tamaño de empresa no parece ser un predictor relevante del salario
 
 ggplot(df %>% filter(!is.na(tam_empresa)),
        aes(x = factor(tam_empresa, 
@@ -406,11 +393,12 @@ ggplot(df %>% filter(!is.na(tam_empresa)),
 
 
 
+# CONCLUSION SECCION 7:
+# Seniority y dolarización son las variables categóricas con mayor poder discriminante.
+# Modalidad y tamaño de empresa no muestran diferencias salariales relevantes.
+# Dolarización confirma hipótesis de bimodalidad — brecha del 34% en salario bruto.
 
-# OBSERVACIONES: 
-
-
-# TABLAS RESUMEN
+# Tablas de apoyo
 
 # mediana por seniority
 
@@ -440,6 +428,7 @@ df %>%
     mediana_salario = median(sal_bruto, na.rm = TRUE),
     cantidad = n()
   )
+
 
 # -----------------------------------------------------------------------------
 # 8. VARIABLES POTENCIALMENTE CONFUNDIDORAS

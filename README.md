@@ -15,6 +15,53 @@ Se consolidaron múltiples ediciones semestrales de la encuesta (2019–2026), c
 * Identificar factores asociados al salario.
 * Construir modelos estadísticos para explicar las diferencias salariales observadas.
 
+
+## Pregunta de investigación
+
+¿Qué factores explican mejor las diferencias salariales entre los profesionales del área de datos en Argentina?
+
+
+## Hipótesis
+
+H1. A mayor experiencia laboral, mayor salario.
+
+H2. El seniority tiene un efecto positivo sobre el salario.
+
+H3. Los profesionales con salario dolarizado perciben mayores ingresos.
+
+H4. Existen diferencias salariales entre los distintos grupos de roles.
+
+H5. Las personas con personal a cargo perciben salarios superiores.
+
+
+## Variable objetivo
+
+La variable objetivo utilizada para el modelado es:
+
+log_sal = log(salario_bruto)
+
+Se utiliza la transformación logarítmica para reducir la asimetría presente en la distribución salarial y cumplir mejor los supuestos de los modelos de regresión lineal.
+
+
+## Resultados esperados
+
+Identificar qué variables tienen mayor capacidad explicativa sobre los salarios del sector IT argentino y cuantificar su impacto relativo.
+
+
+## Metodología
+
+El proyecto se desarrolla en cuatro etapas:
+
+1. Consolidación de encuestas históricas.
+2. Limpieza y transformación de variables.
+3. Análisis exploratorio de datos (EDA).
+4. Modelado estadístico mediante regresión lineal.
+
+
+## Resultados esperados
+
+Identificar qué variables tienen mayor capacidad explicativa sobre los salarios del sector IT argentino y cuantificar su impacto relativo.
+
 ---
 
 ## Estructura del proyecto

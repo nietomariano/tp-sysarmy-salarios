@@ -67,7 +67,8 @@ df_sysarmy.csv
 
 Las encuestas utilizadas fueron obtenidas de las publicaciones públicas de Sysarmy:
 
-https://sysarmy.com/blog/posts/resultados-de-las-encuestas/
+https://sueldos.openqube.io/encuesta-sueldos-2026.01/
+https://sysarmy.com/
 
 ---
 

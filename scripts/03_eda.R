@@ -135,45 +135,58 @@ summary(df$gente_a_cargo)
 # 5. DISTRIBUCION DE LA VARIABLE OBJETIVO
 # -----------------------------------------------------------------------------
 
-ggplot(df, aes(x = sal_bruto)) +
-  geom_histogram(bins = 50) +
-  labs(
-    title = "Distribución del salario bruto",
-    x = "Salario bruto",
-    y = "Frecuencia"
-  )
+
+  ggplot(df, aes(x = sal_bruto)) +
+    geom_histogram(
+      bins = 40,
+      fill = "steelblue",
+      color = "white"
+    ) +
+    labs(
+      title = "Distribución del salario bruto",
+      x = "salario bruto",
+      y = "Frecuencia"
+    ) +
+    theme_minimal()
+
+
 
 ggplot(df, aes(x = log_sal)) +
-  geom_histogram(bins = 30) +
+  geom_histogram(
+    bins = 40,
+    fill = "steelblue",
+    color = "white"
+  ) +
   labs(
-    title = "Distribución de log_sal",
+    title = "Distribución del logaritmo del salario",
     x = "Logaritmo del salario",
     y = "Frecuencia"
-  )
+  ) +
+  theme_minimal()
+
+
 
 ggplot(df, aes(x = log_sal)) +
   geom_histogram(
     aes(y = after_stat(density)),
-    bins = 30
+    bins = 30, fill = "steelblue", color = "black", alpha = 0.6
   ) +
-  geom_density() +
+  geom_density(color = "red", size = 1) +
   labs(
     title = "Distribución de log_sal con curva de densidad",
     x = "Logaritmo del salario",
     y = "Densidad"
   )
 
-ggplot(df, aes(y = sal_bruto)) +
-  geom_boxplot() +
+
+ggplot(df, aes(y = log_sal)) +
+  geom_boxplot(fill = "steelblue") +
   labs(
-    title = "Boxplot del salario bruto",
-    y = "Salario bruto"
-  )
-
-
-# La distribución de sal_bruto es muy asimétrica. Luego de aplicar logaritmo 
-# (log_sal) se aproxima mucho más a una distribución normal.
-
+    title = "Boxplot del logaritmo del salario",
+    y = "Logaritmo del salario",
+    x = ""
+  ) +
+  theme_minimal()
 
 # -----------------------------------------------------------------------------
 # 6. VARIABLES NUMERICAS
@@ -195,7 +208,7 @@ ggplot(df, aes(x = experiencia, y = log_sal)) +
 
 ggplot(df, aes(x = edad, y = log_sal)) +
   geom_jitter(alpha = 0.5, color = "darkblue") +
-  geom_smooth(method = "lm") +
+  geom_smooth(method = "lm", color = "red") +
   labs(
     title = "Salario vs edad",
     x = "Edad",
@@ -216,7 +229,10 @@ ggplot(df, aes(x = gente_a_cargo, y = log_sal)) +
 
 
 
-ggplot(df, aes(x = gente_a_cargo_grupo, y = log_sal)) +
+ggplot(df, aes(x = factor(gente_a_cargo_grupo, 
+                           levels = c("Sin equipo","Equipo pequeño",
+                                      "Equipo mediano","Equipo grande")), 
+                y = log_sal)) +
   geom_boxplot(fill = "lightblue") +
   labs(
     title = "Salario según personas a cargo",
@@ -225,16 +241,9 @@ ggplot(df, aes(x = gente_a_cargo_grupo, y = log_sal)) +
   )
 
 
+
 # Observaciones:
-#
-# - La experiencia muestra una relación positiva con el salario.
-# - La edad también presenta una tendencia positiva.
-# - Las personas con equipos a cargo parecen percibir salarios mayores.
-# - Existe una dispersión considerable, por lo que estas variables
-#   no explican por sí solas las diferencias salariales observadas.
-#
-# Esto sugiere que será necesario incorporar variables categóricas
-# como seniority, modalidad, grupo de rol y sueldo dolarizado.
+
 
 
 # -----------------------------------------------------------------------------
@@ -244,67 +253,81 @@ ggplot(df, aes(x = gente_a_cargo_grupo, y = log_sal)) +
 
 # SENIORITY
 
+# Filtramos NA porque no aporta al grafico y mejoramos la visual.
+# Con caption hacemos aclaracion del filtro ( Check List)
 
-ggplot(df, aes(x = seniority, y = log_sal, fill = seniority)) +
+ggplot(df %>% filter(!is.na(seniority)), 
+       aes(x = seniority, y = log_sal, fill = seniority)) +
   geom_boxplot() +
-  theme(legend.position = "none")+
   labs(
-    title = "Salario según seniority",
+    title = "Distribución salarial según seniority",
     x = "Seniority",
-    y = "Logaritmo del salario"
-  )
-
-
-# El salario aumenta claramente a medida que aumenta el seniority.
-# Se observa una separacion marcada entre Junior, Semi-Senior y Senior.
+    y = "Logaritmo del salario bruto (log)",
+    caption = "Solo períodos 2024-2026 | n = 5.091 observaciones"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
 
 
 # MODALIDAD
 
-ggplot(df, aes(x = modalidad, y = log_sal)) +
-  geom_boxplot(fill = "lightgreen") +
-  labs(
-    title = "Salario según modalidad de trabajo",
-    x = "Modalidad",
-    y = "Logaritmo del salario"
-  )
+# Filtramos NA porque no aporta al grafico y mejoramos la visual.
+# Con caption hacemos aclaracion del filtro ( Check List)
 
-# Obervaciones entre diferencias entre trabajo remot?
-# No encuentro algo claro para marcar. Pareciera que presencial disminuye vs Remoto e hibrido.
+
+ggplot(df %>% filter(!is.na(modalidad)),
+       aes(x = modalidad, y = log_sal, fill = modalidad)) +
+  geom_boxplot() +
+  labs(
+    title = "Distribución salarial según modalidad de trabajo",
+    x = "Modalidad de trabajo",
+    y = "Logaritmo del salario bruto (log)",
+    caption = "Períodos 2019-2022 | n = 8.195 observaciones"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
 
 
 # SUELDO SEGUN DOLARIZACION
 
+# Filtramos NA porque no aporta al grafico y mejoramos la visual.
+# Con caption hacemos aclaracion del filtro ( Check List)
 
-ggplot(df,
-       aes(
-         x = sueldo_dolarizado,
-         y = log_sal,
-         fill = sueldo_dolarizado
-       )) +
+
+
+ggplot(df %>% filter(!is.na(sueldo_dolarizado)),
+       aes(x = factor(sueldo_dolarizado, 
+                      labels = c("No dolarizado", "Dolarizado")),
+           y = log_sal,
+           fill = factor(sueldo_dolarizado))) +
   geom_boxplot() +
   labs(
-    title = "Salario según dolarización",
-    x = "Sueldo dolarizado",
-    y = "Logaritmo del salario"
+    title = "Distribución salarial según dolarización del sueldo",
+    x = "Tipo de sueldo",
+    y = "Logaritmo del salario bruto (log)",
+    caption = "Solo períodos 2024-2026 | n = 5.091 observaciones"
   ) +
+  theme_minimal() +
   theme(legend.position = "none")
 
 # SUELDO DOLARIZADO: Experiencia vs Salario segun dolarizacion
+# SIN N/A, aclaramos con caption
 
-ggplot(df,
-       aes(
-         x = experiencia,
-         y = log_sal,
-         color = sueldo_dolarizado
-       )) +
-  geom_point(alpha = 0.4) +
-  geom_smooth(method = "lm") +
+ggplot(df %>% filter(!is.na(sueldo_dolarizado)),
+       aes(x = experiencia, 
+           y = log_sal,
+           color = factor(sueldo_dolarizado, 
+                          labels = c("No dolarizado", "Dolarizado")))) +
+  geom_point(alpha = 0.4, size = 0.8) +
+  geom_smooth(method = "lm", se = TRUE) +
   labs(
-    title = "Experiencia vs salario según dolarización",
-    x = "Experiencia",
-    y = "Logaritmo del salario"
-  )
+    title = "Relación entre experiencia y salario según dolarización",
+    x = "Años de experiencia",
+    y = "Logaritmo del salario bruto (log)",
+    color = "Tipo de sueldo",
+    caption = "Línea: ajuste lineal con intervalo de confianza al 95% | Solo períodos 2024-2026"
+  ) +
+  theme_minimal()
 
 
 
@@ -312,44 +335,51 @@ ggplot(df,
 
 # PERSONAS A CARGO
 
+
 ggplot(df,
-       aes(
-         x = gente_a_cargo_grupo,
-         y = log_sal,
-         fill = gente_a_cargo_grupo
-       )) +
+       aes(x = gente_a_cargo_grupo, 
+           y = log_sal, 
+           fill = gente_a_cargo_grupo)) +
   geom_boxplot() +
   labs(
-    title = "Salario según personas a cargo",
-    x = "Grupo",
-    y = "Logaritmo del salario"
+    title = "Distribución salarial según tamaño del equipo a cargo",
+    x = "Tamaño del equipo a cargo",
+    y = "Logaritmo del salario bruto (log)"
   ) +
+  theme_minimal() +
   theme(legend.position = "none")
+
+
 
 # OBSERVACIONES: 
 
 
 
 # TAMANO DE LA EMPRESA
+# forzamos el orden de los datos en el eje x porque ordena alfabeticamente  las categorias y queda desordenado #.
 
 
-ggplot(df,
-       aes(
-         x = tam_empresa,
-         y = log_sal
-       )) +
-  geom_boxplot() +
+ggplot(df %>% filter(!is.na(tam_empresa)),
+       aes(x = factor(tam_empresa, 
+                      levels = c("1", "2-10", "11-50", "51-100", 
+                                 "101-200", "201-500", "501-1000", 
+                                 "1001-2000", "2001-5000", 
+                                 "5001-10000", "+10000")), 
+           y = log_sal)) +
+  geom_boxplot(fill = "steelblue") +
   labs(
-    title = "Salario según tamaño de empresa",
-    x = "Tamaño de empresa",
-    y = "Logaritmo del salario"
+    title = "Distribución salarial según tamaño de la organización",
+    x = "Cantidad de personas en la organización",
+    y = "Logaritmo del salario bruto (log)"
   ) +
+  theme_minimal() +
   theme(
-    axis.text.x = element_text(
-      angle = 45,
-      hjust = 1
-    )
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1)
   )
+
+
+
 
 # OBSERVACIONES: 
 

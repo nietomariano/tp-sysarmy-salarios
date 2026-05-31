@@ -28,7 +28,7 @@ df <- read_csv(
 # 2. ESTRUCTURA GENERAL
 # -----------------------------------------------------------------------------
 
-glimpse(df) # 15.288
+glimpse(df) # 15.212
 colnames(df)
 
 # -----------------------------------------------------------------------------
@@ -112,15 +112,16 @@ df %>%
   )
 
 
-### VARIABLES NUMERICAS
+# VARIABLES NUMERICAS
 
-
-# sal_bruto: media (1.049.037) - mediana (270.000) — distribucion asimetrica
-# confirma uso de log_sal como variable objetivo
+# sal_bruto: distribucion asimetrica en pesos — no comparable entre periodos por inflacion
 summary(df$sal_bruto)
 
-# log_sal: media (12.74) y mediana (12.51) mas cercanas - buen uso de log()
-summary(df$log_sal)
+# sal_usd_blue: salario deflactado por dolar blue — comparable entre 2019 y 2026
+summary(df$sal_usd_blue)
+
+# log_sal_usd: media y mediana mas cercanas — confirma uso de log como variable objetivo
+summary(df$log_sal_usd)
 
 # experiencia: mediana 6 anios, máximo 65 — posible outlier en el maximo
 summary(df$experiencia)
@@ -138,60 +139,64 @@ summary(df$gente_a_cargo)
 # -----------------------------------------------------------------------------
 
 
-  ggplot(df, aes(x = sal_bruto)) +
-    geom_histogram(
-      bins = 40,
-      fill = "steelblue",
-      color = "white"
-    ) +
-    labs(
-      title = "Distribución del salario bruto",
-      x = "Salario bruto (ARS)",
-      y = "Frecuencia"
-    ) +
-    theme_minimal()
-
-
-
-ggplot(df, aes(x = log_sal)) +
+# sal_usd_blue: distribucion asimetrica — se confirma necesidad de transformacion log
+ggplot(df, aes(x = sal_usd_blue)) +
   geom_histogram(
     bins = 40,
     fill = "steelblue",
     color = "white"
   ) +
   labs(
-    title = "Distribución del logaritmo del salario",
-    x = "Logaritmo del salario",
+    title = "Distribución del salario en dólares blue",
+    x = "Salario (USD)",
     y = "Frecuencia"
   ) +
   theme_minimal()
 
 
 
-# Histograma con densidad — linea roja muestra curva de densidad estimada
-# Grafico principal de esta seccion — se observa distribucion bimodal
-# Dos picos sugieren -> dos grupos salariales distintos (pesos vs dolares)
-ggplot(df, aes(x = log_sal)) +
+# log_sal_usd: distribucion mas simetrica — confirma uso de log como variable objetivo
+ggplot(df, aes(x = log_sal_usd)) +
   geom_histogram(
-    aes(y = after_stat(density)),
-    bins = 40, fill = "steelblue",color = "white"
+    bins = 40,
+    fill = "steelblue",
+    color = "white"
   ) +
-  geom_density(color = "red", size = 1) +
   labs(
-    title = "Distribución de log_sal con curva de densidad",
-    x = "Logaritmo del salario",
-    y = "Densidad"
-  )+
+    title = "Distribución del logaritmo del salario (USD)",
+    x = "Logaritmo del salario (USD)",
+    y = "Frecuencia"
+  ) +
   theme_minimal()
 
 
 
-# Boxplot del logarito del salario bruto
-ggplot(df, aes(y = log_sal)) +
+# Histograma con densidad — grafico principal de esta seccion
+# Distribucion unimodal aproximadamente normal — confirma que log_sal_usd
+# es una buena variable objetivo para el modelo de regresion lineal
+# La cola izquierda corresponde a casos con salarios bajos que sobrevivieron el filtro
+# Contraste con log_sal en pesos: ahi se observaba bimodalidad por la inflacion
+ggplot(df, aes(x = log_sal_usd)) +
+  geom_histogram(
+    aes(y = after_stat(density)),
+    bins = 40, fill = "steelblue", color = "white"
+  ) +
+  geom_density(color = "red", size = 1) +
+  labs(
+    title = "Distribución de log_sal_usd con curva de densidad",
+    x = "Logaritmo del salario (USD)",
+    y = "Densidad"
+  ) +
+  theme_minimal()
+
+
+
+# Boxplot
+ggplot(df, aes(y = log_sal_usd)) +
   geom_boxplot(fill = "steelblue") +
   labs(
-    title = "Boxplot del logaritmo del salario",
-    y = "Logaritmo del salario",
+    title = "Boxplot del logaritmo del salario (USD)",
+    y = "Logaritmo del salario (USD)",
     x = ""
   ) +
   theme_minimal()
@@ -206,15 +211,15 @@ ggplot(df, aes(y = log_sal)) +
 # Relacion positiva debil — experiencia sola no determina el salario
 # Alta dispersion vertical
 # La mayoria de observaciones se encuentran entre 0 y 20 anios de experiencia
-ggplot(df, aes(x = experiencia, y = log_sal)) +
+ggplot(df, aes(x = experiencia, y = log_sal_usd)) +
   geom_jitter(alpha = 0.5, color = "darkgreen") +
   geom_smooth(method = "lm", color = "red") +
   labs(
     title = "Relación entre experiencia y salario",
     x = "Años de experiencia",
-    y = "Logaritmo del salario bruto (log)",
+    y = "Logaritmo del salario (USD)",
     caption = "Línea roja: ajuste lineal"
-  )+
+  ) +
   theme_minimal()
 
 
@@ -223,13 +228,13 @@ ggplot(df, aes(x = experiencia, y = log_sal)) +
 # Tendencia positiva similar a experiencia pero con mayor dispersion
 # Edad y experiencia probablemente correlacionadas — riesgo de multicolinealidad
 # Se evaluara incluir solo una de las dos en el modelo final
-ggplot(df, aes(x = edad, y = log_sal)) +
+ggplot(df, aes(x = edad, y = log_sal_usd)) +
   geom_jitter(alpha = 0.5, color = "darkblue") +
   geom_smooth(method = "lm", color = "red") +
   labs(
     title = "Relación entre edad y salario",
     x = "Edad (años)",
-    y = "Logaritmo del salario bruto (log)",
+    y = "Logaritmo del salario (USD)",
     caption = "Línea roja: ajuste lineal"
   ) +
   theme_minimal()
@@ -239,13 +244,13 @@ ggplot(df, aes(x = edad, y = log_sal)) +
 # 80% de observaciones en x=0 — ajuste lineal poco confiable
 # Zona gris del lm se abre hacia la derecha por escasez de datos en valores altos
 # El boxplot por grupos probablemente sea mas informativo para esta variable
-ggplot(df, aes(x = gente_a_cargo, y = log_sal)) +
+ggplot(df, aes(x = gente_a_cargo, y = log_sal_usd)) +
   geom_jitter(alpha = 0.5, color = "purple") +
   geom_smooth(method = "lm") +
   labs(
     title = "Relación entre personas a cargo y salario",
     x = "Cantidad de personas a cargo",
-    y = "Logaritmo del salario bruto (log)",
+    y = "Logaritmo del salario (USD)",
     caption = "Línea roja: ajuste lineal | Zona gris: margen de incertidumbre"
   ) +
   theme_minimal()
@@ -254,16 +259,16 @@ ggplot(df, aes(x = gente_a_cargo, y = log_sal)) +
 # Mediana salarial aumenta progresivamente con el tamaño del equipo
 # Cajas de tamaño similar — dispersion parecida entre los grupos
 # Equipo grande tiene pocos casos
-ggplot(df, aes(x = factor(gente_a_cargo_grupo, 
-                           levels = c("Sin equipo","Equipo pequeño",
-                                      "Equipo mediano","Equipo grande")), 
-                y = log_sal)) +
+ggplot(df, aes(x = factor(gente_a_cargo_grupo,
+                          levels = c("Sin equipo","Equipo pequeño",
+                                     "Equipo mediano","Equipo grande")),
+               y = log_sal_usd)) +
   geom_boxplot(fill = "lightblue") +
   labs(
     title = "Distribución salarial según tamaño del equipo a cargo",
     x = "Tamaño del equipo a cargo",
-    y = "Logaritmo del salario bruto (log)"
-  )+
+    y = "Logaritmo del salario (USD)"
+  ) +
   theme_minimal()
 
 
@@ -286,14 +291,14 @@ ggplot(df, aes(x = factor(gente_a_cargo_grupo,
 # Medianas crecen progresivamente: Junior < Semi-Senior < Senior
 # Senior tiene levemente la caja con mayor dispersión
 ggplot(df %>% filter(!is.na(seniority)), 
-       aes(x = seniority, y = log_sal, fill = seniority)) +
+       aes(x = seniority, y = log_sal_usd, fill = seniority)) +
   geom_boxplot() +
   labs(
     title = "Distribución salarial según seniority",
     x = "Seniority",
-    y = "Logaritmo del salario bruto (log)",
-    caption = "Solo períodos 2024-2026 | n = 5.091 observaciones"
-  )+
+    y = "Logaritmo del salario (USD)",
+    caption = "Solo períodos 2024-2026"
+  ) +
   theme_minimal()
 
 
@@ -301,60 +306,52 @@ ggplot(df %>% filter(!is.na(seniority)),
 # Presencial muestra mediana levemente inferior y menor dispersión
 # Medianas similares entre Remoto e Hibrido
 # Modalidad no pareciera ser un determinante relevante del salario
-
 ggplot(df %>% filter(!is.na(modalidad)),
-       aes(x = modalidad, y = log_sal, fill = modalidad)) +
+       aes(x = modalidad, y = log_sal_usd, fill = modalidad)) +
   geom_boxplot() +
   labs(
     title = "Distribución salarial según modalidad de trabajo",
     x = "Modalidad de trabajo",
-    y = "Logaritmo del salario bruto (log)",
-    caption = "Períodos 2019-2022 | n = 8.195 observaciones"
+    y = "Logaritmo del salario (USD)"
   ) +
   theme_minimal()
 
 
 # DOLARIZACION
-# Diferencia salarial mas pronunciada de todas las variables categóricas
-# Dolarizado: mediana 14.9 ($2.916.000) vs No dolarizado: 14.6 ($2.180.000)
-# Confirma hipotesis de bimodalidad observada en sección 5
-
+# Con salario deflactado la brecha se achica — quienes cobran en dolares
+# ya estan capturados en la misma escala que el resto
 ggplot(df %>% filter(!is.na(sueldo_dolarizado)),
        aes(x = factor(sueldo_dolarizado, 
                       labels = c("No dolarizado", "Dolarizado")),
-           y = log_sal,
+           y = log_sal_usd,
            fill = factor(sueldo_dolarizado))) +
   geom_boxplot() +
   labs(
     title = "Distribución salarial según dolarización del sueldo",
     x = "Tipo de sueldo",
-    y = "Logaritmo del salario bruto (log)",
-    caption = "Solo períodos 2024-2026 | n = 5.091 observaciones"
+    y = "Logaritmo del salario (USD)",
+    caption = "Solo períodos 2024-2026"
   ) +
   theme_minimal()
 
-# Tabla de apoyo para visualizar mediana de log_sal segun sueldo dolarizado 
-# TRUE o FALSE
-
+# Tabla de apoyo
 df %>%
   filter(!is.na(sueldo_dolarizado)) %>%
   group_by(sueldo_dolarizado) %>%
   summarise(
-    mediana = median(log_sal, na.rm = TRUE),
-    mediana_pesos = median(sal_bruto, na.rm = TRUE),
+    mediana_usd = median(sal_usd_blue, na.rm = TRUE),
     n = n()
   )
 
 
-# RELACION ENTRE EXPERIENCIA y SALARIO SEGUN DOLARIZACION
-# Brecha salarial entre dolarizados y no dolarizados se mantiene en toda 
-# la trayectoria
-# Las líneas no son paralelas — brecha crece levemente con la experiencia
-# Dolarizar el sueldo tiene mayor impacto salarial a largo plazo
-
+# RELACION ENTRE EXPERIENCIA Y SALARIO SEGUN DOLARIZACION
+# Las lineas son casi paralelas y parten del mismo punto
+# En USD la dolarizacion no genera ventaja salarial significativa
+# Confirma que la brecha observada en pesos era un efecto de la inflacion
+# no una diferencia real de poder adquisitivo
 ggplot(df %>% filter(!is.na(sueldo_dolarizado)),
        aes(x = experiencia, 
-           y = log_sal,
+           y = log_sal_usd,
            color = factor(sueldo_dolarizado, 
                           labels = c("No dolarizado", "Dolarizado")))) +
   geom_point(alpha = 0.4, size = 0.8) +
@@ -362,11 +359,12 @@ ggplot(df %>% filter(!is.na(sueldo_dolarizado)),
   labs(
     title = "Relación entre experiencia y salario según dolarización",
     x = "Años de experiencia",
-    y = "Logaritmo del salario bruto (log)",
+    y = "Logaritmo del salario (USD)",
     color = "Tipo de sueldo",
-    caption = "Línea: ajuste lineal con intervalo de confianza al 95% | Solo períodos 2024-2026"
+    caption = "Solo períodos 2024-2026"
   ) +
   theme_minimal()
+
 
 
 
@@ -381,57 +379,48 @@ ggplot(df %>% filter(!is.na(tam_empresa)),
                                  "101-200", "201-500", "501-1000", 
                                  "1001-2000", "2001-5000", 
                                  "5001-10000", "+10000")), 
-           y = log_sal)) +
+           y = log_sal_usd)) +
   geom_boxplot(fill = "steelblue") +
   labs(
     title = "Distribución salarial según tamaño de la organización",
     x = "Cantidad de personas en la organización",
-    y = "Logaritmo del salario bruto (log)"
+    y = "Logaritmo del salario (USD)"
   ) +
   theme(
     legend.position = "none",
     axis.text.x = element_text(angle = 45, hjust = 1)
-  )+
+  ) +
   theme_minimal()
 
 
 
 # CONCLUSION SECCION 7:
-# Seniority y dolarización son las variables categóricas con mayor poder discriminante.
+# Seniority es la variable categórica con mayor poder discriminante.
 # Modalidad y tamaño de empresa no muestran diferencias salariales relevantes.
-# Dolarización confirma hipótesis de bimodalidad — brecha del 34% en salario bruto.
+# Dolarización en pesos nominales mostraba brecha del 34%, pero al deflactar
+# por dolar blue la diferencia prácticamente desaparece — era un efecto inflacionario.
 
 # Tablas de apoyo
-
-# mediana por seniority
-
 df %>%
   group_by(seniority) %>%
   summarise(
-    mediana_salario = median(sal_bruto, na.rm = TRUE),
+    mediana_usd = median(sal_usd_blue, na.rm = TRUE),
     cantidad = n()
   )
-
-
-# mediana por modalidad
 
 df %>%
   group_by(modalidad) %>%
   summarise(
-    mediana_salario = median(sal_bruto, na.rm = TRUE),
+    mediana_usd = median(sal_usd_blue, na.rm = TRUE),
     cantidad = n()
   )
-
-
-# mediana por sueldo dolarizado
 
 df %>%
   group_by(sueldo_dolarizado) %>%
   summarise(
-    mediana_salario = median(sal_bruto, na.rm = TRUE),
+    mediana_usd = median(sal_usd_blue, na.rm = TRUE),
     cantidad = n()
   )
-
 
 # -----------------------------------------------------------------------------
 # 8. VARIABLES POTENCIALMENTE CONFUNDIDORAS
@@ -440,41 +429,42 @@ df %>%
 
 
 # GENERO
-# Sin controlar por seniority — mujeres muestran mediana levemente superior
-# Conclusion apresurada: no hay brecha salarial de genero
-# Este grafico solo es el punto de partida — ver gráficos 2 y 3
+# Sin controlar por seniority — hombres muestran mediana levemente superior
+# Podría sugerir una brecha salarial de género, pero es necesario controlar
+# por otras variables antes de concluir
 ggplot(df,
-       aes(x = genero_simple, y = log_sal, fill = genero_simple)) +
+       aes(x = genero_simple, y = log_sal_usd, fill = genero_simple)) +
   geom_boxplot() +
   labs(
     title = "Distribución salarial según género",
     x = "Género",
-    y = "Logaritmo del salario bruto (log)"
+    y = "Logaritmo del salario (USD)"
   ) +
   theme_minimal()
 
 
-# Controlando por seniority - distribuciones de hombre y mujer muy similares
-# El patron Junior < Semi-Senior < Senior se repite igual en ambos generos.
-# La brecha que observamos en el grafico 1 desaparece al controlar por seniority.
+# Controlando por seniority — persiste una brecha salarial a favor de hombres
+# especialmente visible en Semi-Senior y Senior
+# El genero tiene un efecto independiente del seniority
+# Esto sugiere incluir genero_simple en el modelo para cuantificar su efecto real
 ggplot(df %>% filter(!is.na(seniority)),
-       aes(x = genero_simple, y = log_sal, fill = seniority)) +
+       aes(x = genero_simple, y = log_sal_usd, fill = seniority)) +
   geom_boxplot() +
   labs(
     title = "Distribución salarial según género y seniority",
     x = "Género",
-    y = "Logaritmo del salario bruto (log)",
+    y = "Logaritmo del salario (USD)",
     fill = "Seniority",
-    caption = "Solo períodos 2024-2026 | n = 5.091 observaciones"
+    caption = "Solo períodos 2024-2026"
   ) +
   theme_minimal()
 
 
 
-# Hombres tienen mayor proporcion de Senior (~50%) vs mujeres (~30%)
+# Hombres tienen mayor proporcion de Senior (~53%) vs mujeres (~35%)
 # Mujeres tienen mayor proporcion de Junior y Semi-Senior
-# Explica porque el genero parece relevante sin controlar si 
-# es el seniority el factor real
+# La distribucion de seniority amplifica la brecha pero no la explica completamente
+# — la diferencia persiste dentro de cada nivel de seniority
 ggplot(df %>% filter(!is.na(seniority)),
        aes(x = genero_simple, fill = seniority)) +
   geom_bar(position = "fill") +
@@ -483,7 +473,7 @@ ggplot(df %>% filter(!is.na(seniority)),
     x = "Género",
     y = "Proporción",
     fill = "Seniority",
-    caption = "Solo períodos 2024-2026 | n = 5.091 observaciones"
+    caption = "Solo períodos 2024-2026"
   ) +
   theme_minimal()
 
@@ -492,17 +482,18 @@ ggplot(df %>% filter(!is.na(seniority)),
 df %>%
   group_by(grupo_rol) %>%
   summarise(
-    mediana_salario = median(sal_bruto, na.rm = TRUE),
+    mediana_usd = median(sal_usd_blue, na.rm = TRUE),
     cantidad = n()
   ) %>%
-  arrange(desc(mediana_salario))
-
+  arrange(desc(mediana_usd))
+  
 
 # CONCLUSION SECCION 8:
-# El genero no es un determinante salarial independiente.
-# Seniority actua como variable confundidora — hombres Senior ~50%  vs 
-# mujeres Senior ~30%.
-# Al controlar por seniority, las diferencias salariales entre generos desaparecen.
+# El genero muestra una brecha salarial a favor de hombres incluso controlando
+# por seniority — especialmente en Semi-Senior y Senior.
+# La distribucion de seniority amplifica la brecha: hombres ~53% Senior 
+# vs mujeres ~35% Senior.
+# El genero sera incluido en el modelo para cuantificar su efecto independiente.
 
 
 # -----------------------------------------------------------------------------
@@ -510,18 +501,17 @@ df %>%
 # -----------------------------------------------------------------------------
 
 # SALARIO SEGUN REGION
-# GBA tiene mediana mas alta y distribucion más compacta que CABA e Interior
-# Posiblemente esto refleje profesionales remotos trabajando para empresas 
-# de CABA.
-# CABA e Interior tienen medianas similares pero mayor dispersion
-# Observaciones: CABA=8.461, GBA=915, Interior=5.912
-ggplot(df,
-       aes(x = region, y = log_sal, fill = region)) +
+# Las tres regiones muestran medianas muy similares en USD
+# CABA tiene una leve ventaja pero las diferencias son pequeñas
+# El mercado IT argentino es relativamente homogéneo en términos geográficos
+# Observaciones: CABA = 8.434, GBA = 2.578, Interior = 4.108
+ggplot(df %>% filter(!is.na(region)),
+       aes(x = region, y = log_sal_usd, fill = region)) +
   geom_boxplot() +
   labs(
     title = "Distribución salarial según región",
     x = "Región",
-    y = "Logaritmo del salario bruto (log)"
+    y = "Logaritmo del salario (USD)"
   ) +
   theme_minimal()
 
@@ -530,76 +520,96 @@ df %>% count(region)
 
 
 # SALARIO SEGUN GRUPO DE ROL
-# Data Science / AI tiene la mediana mas alta — Data Platform / MLOps la 
-# mas baja
-# Diferencias entre grupos menores de lo esperado — medianas similares
+# Medianas muy similares entre todos los grupos en USD
+# Governance / Security tiene leve ventaja — Analytics / Automation la mas baja
+# Las diferencias entre grupos son menores de lo esperado
+# El grupo de rol puede actuar como variable de control en el modelo
+# pero no es un predictor fuerte del salario
 ggplot(df,
-       aes(x = grupo_rol, y = log_sal, fill = grupo_rol)) +
+       aes(x = grupo_rol, y = log_sal_usd, fill = grupo_rol)) +
   geom_boxplot() +
   labs(
     title = "Distribución salarial según grupo de rol",
     x = "Grupo de rol",
-    y = "Logaritmo del salario bruto (log)"
+    y = "Logaritmo del salario (USD)"
   ) +
   theme(
     legend.position = "none",
     axis.text.x = element_text(angle = 15, hjust = 1)
-  )+
+  ) +
   theme_minimal()
 
 
-# TOP DE ROLES CON FILL POR GRUPO — salario por ocupación
-# Entre los puestos AI Engineer tiene la mediana mas alta - DBA la mas baja 
-# Alta variabilidad dentro de cada grupo de rol
-# El puesto (rol) es una etiqueta — seniority y dolarización
-# determinan el salario independientemente del puesto especifico
+# TOP 10 ROLES
+# AI Engineer lidera con la mediana mas alta y menor dispersion
+# BI Analyst / Data Analyst y Business Analyst en el extremo inferior
+# Data Science / AI (celeste) concentra los roles mejor pagos
+# Alta variabilidad dentro de cada rol — especialmente en Data Engineer 
+# y SysAdmin / DevOps / SRE
+# El puesto especifico tiene menor poder explicativo que seniority
 top_roles <- df %>%
   count(trabajo_de, sort = TRUE) %>%
-  slice_head(n = 10) %>%
+  slice_head(n = 9) %>%
   pull(trabajo_de)
 
 ggplot(df %>% filter(trabajo_de %in% top_roles),
-       aes(x = reorder(trabajo_de, log_sal, median),
-           y = log_sal,
+       aes(x = reorder(trabajo_de, log_sal_usd, median),
+           y = log_sal_usd,
            fill = grupo_rol)) +
   geom_boxplot() +
   coord_flip() +
   labs(
-    title = "Distribución salarial por rol — Top 10",
+    title = "Distribución salarial por rol",
     x = "Rol",
-    y = "Logaritmo del salario bruto (log)",
+    y = "Logaritmo del salario (USD)",
     fill = "Grupo de rol"
   ) +
   theme_minimal()
 
 
 # CONCLUSION SECCION 9:
-# Las diferencias regionales son menores de lo esperado — mercado IT relativamente homogeneo.
-# Entre roles, AI Engineer lidera y DBA queda en el extremo inferior.
-# Grupo de rol y region pueden ser variables de control en el modelado.
+# Las diferencias regionales son pequeñas en USD — mercado IT homogeneo geograficamente.
+# CABA tiene una leve ventaja pero no es determinante.
+# Entre grupos de rol las diferencias tambien son moderadas.
+# AI Engineer lidera entre roles individuales, BI Analyst / Data Analyst 
+# queda en el extremo inferior.
+# Region y grupo de rol seran incluidos como variables de control en el modelo.
+
 
 
 # -----------------------------------------------------------------------------
 # 10. CONCLUSIONES DEL EDA
 # -----------------------------------------------------------------------------
 
-
 # VARIABLES CON MAYOR PODER EXPLICATIVO:
-# - Seniority: separación clara entre niveles, mayor señal del EDA
-# - Dolarización: brecha del 34% en salario bruto, confirma bimodalidad
-# - Experiencia: relación positiva pero con alta dispersión
-# - Grupo de rol: Data Science / AI lidera, diferencias moderadas
+# - Seniority: separacion clara entre niveles, mayor señal del EDA
+# - Experiencia: relacion positiva pero con alta dispersion
+# - Grupo de rol: diferencias moderadas, AI Engineer lidera
+# - Genero: persiste una brecha a favor de hombres incluso controlando por seniority
 
 # VARIABLES CON MENOR PODER EXPLICATIVO:
-# - Modalidad: medianas similares entre remoto, híbrido y presencial
+# - Dolarizacion: en pesos nominales mostraba brecha del 34%, pero al deflactar
+#   por dolar blue la diferencia practicamente desaparece
+# - Modalidad: medianas similares entre remoto, hibrido y presencial
 # - Tamaño de empresa: sin tendencia clara ni consistente
-# - Región: mercado IT relativamente homogéneo geográficamente
+# - Region: mercado IT relativamente homogeneo geograficamente
 
 # VARIABLE CONFUNDIDORA IDENTIFICADA:
-# - Seniority confunde la relación género-salario
-# - Al controlar por seniority, diferencias entre géneros desaparecen
+# - Seniority confunde parcialmente la relacion genero-salario
+# - Hombres tienen mayor proporcion de Senior (~53%) vs mujeres (~35%)
+# - Sin embargo la brecha persiste dentro de cada nivel de seniority
 
-# DECISIÓN DE MODELADO:
-# - Modelo 1: datos completos 2019-2026, sin seniority ni dolarización
-# - Modelo 2: datos 2024-2026, incorpora seniority y dolarización
-# - Comparación mediante ANOVA
+
+
+# DECISION DE MODELADO:
+# - Variable objetivo: log_sal_usd — salario deflactado por dolar blue
+
+# PREGUNTAS para generar hipotesis.. 
+#
+# Que rol maximiza el salario en dolares en el sector IT argentino, controlando por experiencia, region y genero?
+# Que rol y nivel de seniority  maximiza el salario en dolares en el sector IT argentino, controlando por experiencia, region y genero?
+#
+# Yendo por esas preguntas quizas un modelo podria ser:
+# Modelo 1 log_sal_usd ~ experiencia + grupo_rol + genero_simple + region + gente_a_cargo ??
+# Modelo 2 —  agregar seniority + sueldo_dolarizado  ??
+#

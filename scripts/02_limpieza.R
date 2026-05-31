@@ -1,5 +1,6 @@
 library(tidyverse)
 
+
 # -----------------------------------------------------------------------------
 # 1. CARGA DEL DATASET CONSOLIDADO
 # -----------------------------------------------------------------------------
@@ -462,27 +463,56 @@ cat("Observaciones después del filtro de calidad:", nrow(df_clean), "\n")
 # 12 NA de sal_bruto + registros con sal_bruto = 0
 
 # -----------------------------------------------------------------------------
-# 7. FILTRO DE OUTLIERS EN SALARIO Y EDAD
+# 7. JOIN CON BLUE 
 # -----------------------------------------------------------------------------
 
-# Usamos percentil 0.1 y 99.9 en lugar del criterio estandar 1-99
-# porque el percentil 99 eliminaba sueldos dolarizados reales de 2024-2026
-# Percentil 0.1: $128 — umbral minimo
-# Percentil 99.9: $22.310.775 — umbral maximo, solo errores evidentes
-# Se eliminaron 47 registros en total
-# Resultado: 15.474
+dolar_blue <- read.csv(
+  "https://api.bluelytics.com.ar/v2/evolution.csv"
+)
 
-q1  <- quantile(df_clean$sal_bruto, 0.001, na.rm = TRUE)
-q99 <- quantile(df_clean$sal_bruto, 0.999, na.rm = TRUE)
+dolar_blue_s<-dolar_blue %>%
+  filter(type == "Blue", day >= as.Date("2019-01-01")) %>%
+  mutate(
+    day        = as.Date(day),
+    valor_blue = (value_sell + value_buy) / 2,
+    anio       = year(day),
+    semestre   = if_else(month(day) <= 6, 1, 2),
+    periodo = as.character(paste(anio, semestre, sep = "."))
+    ) %>%
+  group_by(periodo) %>%
+  summarise(blue_promedio = mean(valor_blue))
 
-cat("Percentil 0.1:", q1, "\n")
-cat("Percentil 99.9:", q99, "\n")
+df_clean <- df_clean %>%
+  mutate(periodo = as.character(periodo))
 
-# Filtramos outliers extremos
+df_clean <- df_clean %>%
+  left_join(dolar_blue_s, by = "periodo") %>%
+  mutate(
+    sal_usd_blue = sal_bruto / blue_promedio,
+    log_sal_usd  = log(sal_usd_blue),
+    valor_blue = blue_promedio
+  )
+
+
+
+
+# -----------------------------------------------------------------------------
+# 8. FILTRO DE OUTLIERS EN SALARIO Y EDAD
+# -----------------------------------------------------------------------------
+
+# Filtramos sobre sal_usd_blue (dólares constantes) en lugar de sal_bruto nominal
+# para que el criterio sea comparable entre períodos
+
+q1  <- quantile(df_clean$sal_usd_blue, 0.001, na.rm = TRUE)
+q99 <- quantile(df_clean$sal_usd_blue, 0.999, na.rm = TRUE)
+
+cat("Percentil 0.1 (USD):", q1, "\n")
+cat("Percentil 99.9 (USD):", q99, "\n")
+
 df_clean <- df_clean %>%
   filter(
-    sal_bruto >= q1,
-    sal_bruto <= q99,
+    sal_usd_blue >= q1,
+    sal_usd_blue <= q99,
     is.na(edad) | (edad >= 16 & edad <= 70)
   )
 
@@ -490,7 +520,7 @@ cat("Observaciones después del filtro de outliers:", nrow(df_clean), "\n")
 
 
 # -----------------------------------------------------------------------------
-# 8. SELECCION FINAL DE COLUMNAS
+# 9. SELECCION FINAL DE COLUMNAS
 # -----------------------------------------------------------------------------
 
 
@@ -509,6 +539,9 @@ df_clean <- df_clean %>%
     sal_bruto,
     log_sal,
     sueldo_dolarizado,
+    log_sal_usd,
+    sal_usd_blue,
+    
     
     seniority,
     experiencia,
@@ -535,7 +568,7 @@ glimpse(df_clean) # 15.474 registros , 23 columnas
 
 
 # -----------------------------------------------------------------------------
-# 9. VERIFICACIONES FINALES
+# 10. VERIFICACIONES FINALES
 # -----------------------------------------------------------------------------
 
 # Estructura general
@@ -562,26 +595,30 @@ df_clean %>%
     salario_promedio       = mean(sal_bruto, na.rm = TRUE),
     faltantes_salario      = sum(is.na(sal_bruto)),
     log_sal_min            = min(log_sal, na.rm = TRUE),
-    log_sal_infinitos      = sum(is.infinite(log_sal))
+    log_sal_infinitos      = sum(is.infinite(log_sal)),
+    usd_min                = min(sal_usd_blue, na.rm = TRUE),
+    usd_infinitos          = sum(is.infinite(log_sal_usd))
   )
 
-# Esperado:
-# salario_min > 0
-# log_sal_min > 0 — no deberia haber -Inf
-# log_sal_infinitos = 0
-# faltantes_salario = 0
 
+# Verificando que no queden log_usd negativos -> log de cualquier nro <1 da negativo
 df_clean %>%
-  filter(sal_bruto < 100) %>%
-  count(anio, sal_bruto) %>%
-  arrange(sal_bruto)
+  filter(log_sal_usd < 0) %>%
+  summarise(n = n(), min_usd = min(sal_usd_blue), max_usd = max(sal_usd_blue))
 
-df_clean %>%
-  filter(sal_bruto >= 1000 & sal_bruto < 10000) %>%
-  count(anio, sort = TRUE)
+# Filtrando esos log usd negativos
+df_clean <- df_clean %>%
+  filter(
+    sal_usd_blue >= q1,
+    sal_usd_blue <= q99,
+    sal_usd_blue >= 1,          # elimina salarios menores a 1 USD
+    is.na(edad) | (edad >= 16 & edad <= 70)
+  )
+
+
 
 # -----------------------------------------------------------------------------
-# 10. GUARDADO DEL DATASET FINAL
+# 11. GUARDADO DEL DATASET FINAL
 # -----------------------------------------------------------------------------
 
 write_csv(

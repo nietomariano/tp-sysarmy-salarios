@@ -24,6 +24,7 @@ library(tidyverse)
 df <- read_csv(
   "data/processed/df_sysarmy.csv")
 
+
 # -----------------------------------------------------------------------------
 # 2. ESTRUCTURA GENERAL
 # -----------------------------------------------------------------------------
@@ -540,7 +541,7 @@ ggplot(df,
   theme_minimal()
 
 
-# TOP 10 ROLES
+# TOP ROLES
 # AI Engineer lidera con la mediana mas alta y menor dispersion
 # BI Analyst / Data Analyst y Business Analyst en el extremo inferior
 # Data Science / AI (celeste) concentra los roles mejor pagos
@@ -565,6 +566,21 @@ ggplot(df %>% filter(trabajo_de %in% top_roles),
     fill = "Grupo de rol"
   ) +
   theme_minimal()
+
+
+df %>%
+  filter(!is.na(experiencia), !is.na(log_sal)) %>%
+  ggplot(aes(x = experiencia, y = log_sal, color = grupo_rol)) +
+  geom_point(alpha = 0.2, size = 1) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    title = "Salario vs Experiencia por grupo de rol",
+    x = "Años de experiencia",
+    y = "Logaritmo del salario",
+    color = "Grupo de rol"
+  ) +
+  theme_minimal()
+
 
 
 # CONCLUSION SECCION 9:

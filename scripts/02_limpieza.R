@@ -457,6 +457,9 @@ df_clean <- df_clean %>%
     !is.na(log_sal)
   )
 
+df_clean <- df_clean%>%
+  filter(sal_usd_blue >100)
+
 # Verificación post-filtro de cantidad de observaciones finales
 cat("Observaciones después del filtro de calidad:", nrow(df_clean), "\n")
 # Resultado: 15.521 — se eliminaron 19 registros
@@ -614,6 +617,7 @@ df_clean <- df_clean %>%
     sal_usd_blue >= 1,          # elimina salarios menores a 1 USD
     is.na(edad) | (edad >= 16 & edad <= 70)
   )
+
 
 
 

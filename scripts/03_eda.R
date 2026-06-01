@@ -466,7 +466,11 @@ ggplot(df,
 # especialmente visible en Semi-Senior y Senior
 # El genero tiene un efecto independiente del seniority
 # Esto sugiere incluir genero_simple en el modelo para cuantificar su efecto real
-ggplot(df %>% filter(!is.na(seniority)),
+# Filtramos otro / no binario porque para obtener una mejor visualizacion ya que 
+# no entra en nuestro analisis en este caso
+ggplot(df %>% filter(!is.na(seniority), 
+                     genero_simple %in% c("Hombre", "Mujer")),
+
        aes(x = genero_simple, y = log_sal_usd, fill = seniority)) +
   geom_boxplot() +
   labs(
@@ -484,7 +488,10 @@ ggplot(df %>% filter(!is.na(seniority)),
 # Mujeres tienen mayor proporcion de Junior y Semi-Senior
 # La distribucion de seniority amplifica la brecha pero no la explica completamente
 # — la diferencia persiste dentro de cada nivel de seniority
-ggplot(df %>% filter(!is.na(seniority)),
+# Filtramos no binario / otro porque no nos interesa en este analisis
+ggplot(df %>% filter(!is.na(seniority),
+                     genero_simple %in% c("Hombre", "Mujer")),
+       
        aes(x = genero_simple, fill = seniority)) +
   geom_bar(position = "fill") +
   labs(
@@ -785,7 +792,21 @@ df %>%
 # - Sin embargo la brecha persiste dentro de cada nivel de seniority
 
 
-
+  # HALLAZGOS SOBRE USO DE IA (2024-2026):
+# - La adopcion crecio en todos los grupos: de ~30% a ~65-70% de uso alto en dos años
+# - Ciberseguridad es el grupo que adopta más lento
+# - Contraintuitivo: los juniors usan IA mas intensamente que los seniors
+# - El uso de IA no se traduce directamente en mayor salario — esta mediado por rol y seniority
+  
+  
+# DECISION DE MODELADO ??
+# - Variable objetivo: log_sal_usd — salario deflactado por dolar blue
+# - Modelo 1: log_sal_usd ~ experiencia + grupo_rol + genero_simple + region + gente_a_cargo
+# - Modelo 2: agregar seniority
+# - Se espera que grupo_rol = Management sea la categoría con coeficiente más alto
+#   y Desarrollo / QA el de menor efecto marginal
+  
+  
 
 # DECISION DE MODELADO:
 # - Variable objetivo: log_sal_usd — salario deflactado por dolar blue

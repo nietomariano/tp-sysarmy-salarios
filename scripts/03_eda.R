@@ -543,20 +543,22 @@ df %>% count(region)
 # Management supera al resto. Ciberseguridad  e Infraestructura tiene una leve ventaja sobre las demas
 # Desarrollo tiene la mediana mas baja de todas
 # El grupo de rol puede actuar como variable de control en el modelo
+
 ggplot(df,
-       aes(x = grupo_rol, y = log_sal_usd, fill = grupo_rol)) +
+       aes(x = reorder(grupo_rol, log_sal_usd, median),
+           y = log_sal_usd,
+           fill = grupo_rol)) +
   geom_boxplot() +
   labs(
     title = "Distribución salarial según grupo de rol",
     x = "Grupo de rol",
     y = "Logaritmo del salario (USD)"
   ) +
+  theme_minimal() +
   theme(
     legend.position = "none",
     axis.text.x = element_text(angle = 15, hjust = 1)
-  ) +
-  theme_minimal()
-
+  )
 
 # TOP ROLES
 # Manager / Director y Architect lideran con las medianas más altas

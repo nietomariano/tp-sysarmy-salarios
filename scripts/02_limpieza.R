@@ -237,7 +237,7 @@ df_clean <- df_clean %>%
       trabajo_de %in% roles_infraestructura ~ "Infraestructura",
       trabajo_de %in% roles_ciberseguridad  ~ "Ciberseguridad",
       trabajo_de %in% roles_desarrollo      ~ "Desarrollo / QA",
-      trabajo_de %in% roles_liderazgo       ~ "Management"
+      trabajo_de %in% roles_liderazgo       ~ "Roles de gestión"
     ),
     
     grupo_rol = factor(
@@ -247,7 +247,7 @@ df_clean <- df_clean %>%
         "Infraestructura",
         "Ciberseguridad",
         "Desarrollo / QA",
-        "Management"
+        "Roles de gestión"
       )
     ),
     

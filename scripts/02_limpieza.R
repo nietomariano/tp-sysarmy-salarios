@@ -156,8 +156,6 @@ roles_desarrollo <- c(
 roles_liderazgo <- c(
   "Technical Leader",
   "Manager / Director",
-  "Project Manager",
-  "Scrum Master",
   "VP / C-Level"
 )
 

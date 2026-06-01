@@ -127,7 +127,7 @@ summary(df$log_sal_usd)
 # experiencia: mediana 6 anios, máximo 65 — posible outlier en el maximo
 summary(df$experiencia)
 
-# edad: rango 17-70, 5 NA — no afectan el analisis
+# edad: rango 18-70, algunos NA — filtro aplicado en limpieza (16-70)
 summary(df$edad)
 
 # gente_a_cargo: mediana 0, media 0.74 — 80% sin equipo, distribucion muy sesgada
@@ -242,10 +242,23 @@ ggplot(df, aes(x = edad, y = log_sal_usd)) +
 
 
 # Relacion entre Personas a cargo y salario
-# 80% de observaciones en x=0 — ajuste lineal poco confiable
-# Zona gris del lm se abre hacia la derecha por escasez de datos en valores altos
-# El boxplot por grupos probablemente sea mas informativo para esta variable
+# 80% de observaciones en x=0 - Aplicamos filtro en el siguiente grafico
 ggplot(df, aes(x = gente_a_cargo, y = log_sal_usd)) +
+  geom_jitter(alpha = 0.5, color = "purple") +
+  geom_smooth(method = "lm") +
+  labs(
+    title = "Relación entre personas a cargo y salario",
+    x = "Cantidad de personas a cargo",
+    y = "Logaritmo del salario (USD)",
+    caption = "Línea roja: ajuste lineal | Zona gris: margen de incertidumbre"
+  ) +
+  theme_minimal()
+
+
+# Relacion entre Personas a cargo y salario - con filtro sacando los outliers
+# 80% de observaciones en x=0 — se filtran valores > 200 (errores de carga)
+# El ajuste lineal muestra tendencia positiva pero con alta incertidumbre
+ggplot(df %>% filter(gente_a_cargo <= 200), aes(x = gente_a_cargo, y = log_sal_usd)) +
   geom_jitter(alpha = 0.5, color = "purple") +
   geom_smooth(method = "lm") +
   labs(
@@ -307,12 +320,12 @@ ggplot(df %>% filter(!is.na(seniority)),
 
 
 # MODALIDAD
-# Presencial muestra mediana levemente inferior y menor dispersión
-# Medianas similares entre Remoto e Hibrido
-# Modalidad no pareciera ser un determinante relevante del salario
+# Remoto e Híbrido muestran medianas similares y superiores a Presencial
+# Presencial queda claramente por debajo — diferencia más marcada que antes
 ggplot(df %>% filter(!is.na(modalidad)),
        aes(x = modalidad, y = log_sal_usd, fill = modalidad)) +
   geom_boxplot() +
+  scale_x_discrete(limits = c("Remoto", "Hibrido", "Presencial")) +
   labs(
     title = "Distribución salarial según modalidad de trabajo",
     x = "Modalidad de trabajo",
@@ -329,6 +342,7 @@ ggplot(df %>% filter(!is.na(sueldo_dolarizado)),
                       labels = c("No dolarizado", "Dolarizado")),
            y = log_sal_usd,
            fill = factor(sueldo_dolarizado))) +
+  scale_fill_discrete(name = "Tipo de sueldo") +
   geom_boxplot() +
   labs(
     title = "Distribución salarial según dolarización del sueldo",
@@ -349,8 +363,9 @@ df %>%
 
 
 # RELACION ENTRE EXPERIENCIA Y SALARIO SEGUN DOLARIZACION
-# Las lineas son casi paralelas y parten del mismo punto
-# En USD la dolarizacion no genera ventaja salarial significativa
+# Los dolarizados parten con un intercepto levemente superior (~7.2 vs ~7.0)
+# y la brecha se mantiene a lo largo de toda la trayectoria de experiencia
+# La diferencia es menor que en pesos pero no desaparece completamente
 # Confirma que la brecha observada en pesos era un efecto de la inflacion
 # no una diferencia real de poder adquisitivo
 ggplot(df %>% filter(!is.na(sueldo_dolarizado)),

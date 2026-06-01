@@ -28,7 +28,7 @@ df <- read_csv(
 # 2. ESTRUCTURA GENERAL
 # -----------------------------------------------------------------------------
 
-glimpse(df) # 62.404
+glimpse(df) # 60.356
 colnames(df)
 
 # -----------------------------------------------------------------------------
@@ -707,6 +707,42 @@ df_ia_rol %>%
 # - Sin embargo la brecha persiste dentro de cada nivel de seniority
 
 
+df %>%
+  filter(!is.na(experiencia)) %>%
+  ggplot(aes(x = reorder(grupo_rol, experiencia, median),
+             y = experiencia,
+             fill = grupo_rol)) +
+  geom_violin(alpha = 0.7) +
+  geom_boxplot(width = 0.15, fill = "white", outlier.alpha = 0.2) +
+  labs(
+    title = "Distribución de experiencia por grupo de rol",
+    x = "Grupo de rol",
+    y = "Años de experiencia"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 15, hjust = 1)
+  )
+
+
+df %>% filter(anio == 2026) %>% count(grupo_rol)
+
+df %>%
+  filter(genero_simple %in% c("Hombre", "Mujer")) %>%
+  group_by(anio, genero_simple) %>%
+  summarise(mediana_usd = median(sal_usd_blue, na.rm = TRUE), .groups = "drop") %>%
+  ggplot(aes(x = anio, y = mediana_usd, color = genero_simple, group = genero_simple)) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 3) +
+  labs(
+    title = "Evolución de la brecha salarial por género",
+    subtitle = "Salario mediano en USD — 2019 a 2026",
+    x = "Año",
+    y = "Salario mediano (USD)",
+    color = "Género"
+  ) +
+  theme_minimal()
 
 # DECISION DE MODELADO:
 # - Variable objetivo: log_sal_usd — salario deflactado por dolar blue

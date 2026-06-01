@@ -247,7 +247,7 @@ df_clean <- df_clean %>%
         "Infraestructura",
         "Ciberseguridad",
         "Desarrollo / QA",
-        "Liderazgo / Management"
+        "Management"
       )
     ),
     
@@ -572,7 +572,8 @@ df_clean <- df_clean %>%
   filter(
     sal_usd_blue >= q1,
     sal_usd_blue <= q99,
-    is.na(edad) | (edad >= 16 & edad <= 70)
+    is.na(edad)        | (edad >= 16        & edad <= 70),
+    is.na(experiencia) | (experiencia >= 0  & experiencia <= 45)  # tope en 45 años
   )
 
 cat("Observaciones después del filtro de outliers:", nrow(df_clean), "\n")

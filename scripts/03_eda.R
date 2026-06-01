@@ -28,7 +28,7 @@ df <- read_csv(
 # 2. ESTRUCTURA GENERAL
 # -----------------------------------------------------------------------------
 
-glimpse(df) # 15.212
+glimpse(df) # 62.404
 colnames(df)
 
 # -----------------------------------------------------------------------------
@@ -76,7 +76,8 @@ df %>%
 
 ### VARIABLES CATEGORICAS
 
-# grupo_rol — "Data Platform / MLOps" representa el ~50% del dataset.
+# grupo_rol — los grupos ahora son: Datos/AI, Infraestructura, Ciberseguridad,
+# Desarrollo/QA representan el ~52% del dataset
 df %>%
   count(grupo_rol)%>%
   mutate(
@@ -259,7 +260,9 @@ ggplot(df, aes(x = gente_a_cargo, y = log_sal_usd)) +
 # Mediana salarial aumenta progresivamente con el tamaño del equipo
 # Cajas de tamaño similar — dispersion parecida entre los grupos
 # Equipo grande tiene pocos casos
-ggplot(df, aes(x = factor(gente_a_cargo_grupo,
+df %>%
+  filter(!is.na(gente_a_cargo_grupo)) %>%
+  ggplot(aes(x = factor(gente_a_cargo_grupo,
                           levels = c("Sin equipo","Equipo pequeño",
                                      "Equipo mediano","Equipo grande")),
                y = log_sal_usd)) +
@@ -267,7 +270,8 @@ ggplot(df, aes(x = factor(gente_a_cargo_grupo,
   labs(
     title = "Distribución salarial según tamaño del equipo a cargo",
     x = "Tamaño del equipo a cargo",
-    y = "Logaritmo del salario (USD)"
+    y = "Logaritmo del salario (USD)",
+    caption = "Sin equipo: 0 | Equipo pequeño: 1–4 | Equipo mediano: 5–10 | Equipo grande: más de 10"
   ) +
   theme_minimal()
 
@@ -334,7 +338,7 @@ ggplot(df %>% filter(!is.na(sueldo_dolarizado)),
   ) +
   theme_minimal()
 
-# Tabla de apoyo
+# TABLA DE APOYO
 df %>%
   filter(!is.na(sueldo_dolarizado)) %>%
   group_by(sueldo_dolarizado) %>%
@@ -521,10 +525,9 @@ df %>% count(region)
 
 # SALARIO SEGUN GRUPO DE ROL
 # Medianas muy similares entre todos los grupos en USD
-# Governance / Security tiene leve ventaja — Analytics / Automation la mas baja
-# Las diferencias entre grupos son menores de lo esperado
+# Management supera al resto. Ciberseguridad  e Infraestructura tiene una leve ventaja sobre las demas
+# Desarrollo tiene la mediana mas baja de todas
 # El grupo de rol puede actuar como variable de control en el modelo
-# pero no es un predictor fuerte del salario
 ggplot(df,
        aes(x = grupo_rol, y = log_sal_usd, fill = grupo_rol)) +
   geom_boxplot() +
@@ -541,15 +544,13 @@ ggplot(df,
 
 
 # TOP ROLES
-# AI Engineer lidera con la mediana mas alta y menor dispersion
-# BI Analyst / Data Analyst y Business Analyst en el extremo inferior
-# Data Science / AI (celeste) concentra los roles mejor pagos
-# Alta variabilidad dentro de cada rol — especialmente en Data Engineer 
-# y SysAdmin / DevOps / SRE
+# Manager / Director y Architect lideran con las medianas más altas
+# QA / Tester y Consultant quedan en el extremo inferior
+# Management (violeta) concentra los roles mejor pagos
 # El puesto especifico tiene menor poder explicativo que seniority
 top_roles <- df %>%
   count(trabajo_de, sort = TRUE) %>%
-  slice_head(n = 9) %>%
+  slice_head(n = 10) %>%
   pull(trabajo_de)
 
 ggplot(df %>% filter(trabajo_de %in% top_roles),
@@ -559,7 +560,7 @@ ggplot(df %>% filter(trabajo_de %in% top_roles),
   geom_boxplot() +
   coord_flip() +
   labs(
-    title = "Distribución salarial por rol",
+    title = "Distribución salarial por rol - Top 10",
     x = "Rol",
     y = "Logaritmo del salario (USD)",
     fill = "Grupo de rol"
@@ -567,15 +568,18 @@ ggplot(df %>% filter(trabajo_de %in% top_roles),
   theme_minimal()
 
 
+# Desarrollo/QA y Datos/AI muestran la pendiente más pronunciada —
+# la experiencia premia más en esos grupos
+# Management parte con el intercepto más alto (salario base mayor)
+# Infraestructura crece más lento con la experiencia
 df %>%
   filter(!is.na(experiencia), !is.na(log_sal_usd)) %>%
   ggplot(aes(x = experiencia, y = log_sal_usd, color = grupo_rol)) +
-  geom_point(alpha = 0.2, size = 1) +
   geom_smooth(method = "lm", se = FALSE) +
   labs(
     title = "Salario vs Experiencia por grupo de rol",
-    x = "Años de experiencia",
-    y = "Logaritmo del salario",
+    x     = "Años de experiencia",
+    y     = "Logaritmo del salario (USD)",
     color = "Grupo de rol"
   ) +
   theme_minimal()
@@ -668,7 +672,9 @@ df_ia_rol %>%
 # VARIABLES CON MAYOR PODER EXPLICATIVO:
 # - Seniority: separacion clara entre niveles, mayor señal del EDA
 # - Experiencia: relacion positiva pero con alta dispersion
-# - Grupo de rol: diferencias moderadas, AI Engineer lidera
+# - Grupo de rol: diferencias moderadas entre grupos. Management lidera,
+#   Desarrollo / QA queda en el extremo inferior a nivel de grupo.
+#   A nivel de rol individual, Manager / Director y Architect son los más altos.
 # - Genero: persiste una brecha a favor de hombres incluso controlando por seniority
 
 # VARIABLES CON MENOR PODER EXPLICATIVO:
@@ -694,6 +700,7 @@ df_ia_rol %>%
 # Que rol y nivel de seniority  maximiza el salario en dolares en el sector IT argentino, controlando por experiencia, region y genero?
 #
 # Yendo por esas preguntas quizas un modelo podria ser:
-# Modelo 1 log_sal_usd ~ experiencia + grupo_rol + genero_simple + region + gente_a_cargo ??
-# Modelo 2 —  agregar seniority + sueldo_dolarizado  ??
-#
+# Modelo 1: log_sal_usd ~ experiencia + grupo_rol + genero_simple + region + gente_a_cargo
+# Modelo 2: agregar seniority
+# Se espera que grupo_rol = Management sea la categoría con coeficiente más alto
+# y Desarrollo / QA el de menor efecto marginal

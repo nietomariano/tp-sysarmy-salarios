@@ -25,7 +25,6 @@ df <- read_csv(
   "data/processed/df_sysarmy.csv")
 
 
-# -----------------------------------------------------------------------------
 # 2. ESTRUCTURA GENERAL
 # -----------------------------------------------------------------------------
 
@@ -569,8 +568,8 @@ ggplot(df %>% filter(trabajo_de %in% top_roles),
 
 
 df %>%
-  filter(!is.na(experiencia), !is.na(log_sal)) %>%
-  ggplot(aes(x = experiencia, y = log_sal, color = grupo_rol)) +
+  filter(!is.na(experiencia), !is.na(log_sal_usd)) %>%
+  ggplot(aes(x = experiencia, y = log_sal_usd, color = grupo_rol)) +
   geom_point(alpha = 0.2, size = 1) +
   geom_smooth(method = "lm", se = FALSE) +
   labs(
@@ -590,6 +589,75 @@ df %>%
 # AI Engineer lidera entre roles individuales, BI Analyst / Data Analyst 
 # queda en el extremo inferior.
 # Region y grupo de rol seran incluidos como variables de control en el modelo.
+
+roles_amenazados <- c("BI Analyst / Data Analyst", "Business Analyst")
+roles_nativos    <- c("Data Scientist", "AI Engineer", "AI / Prompt / Chatbots")
+roles_tecnico    <- c("Data Engineer", "SysAdmin / DevOps / SRE", "DBA")
+
+df_ia_rol <- df %>%
+  filter(
+    !is.na(uso_ia),
+    trabajo_de %in% c(roles_amenazados, roles_nativos, roles_tecnico)
+  ) %>%
+  mutate(
+    categoria_rol = case_when(
+      trabajo_de %in% roles_amenazados ~ "Amenazados por IA",
+      trabajo_de %in% roles_nativos    ~ "Nativos de IA",
+      trabajo_de %in% roles_tecnico    ~ "Técnicos / Infraestructura"
+    ),
+    categoria_rol = factor(
+      categoria_rol,
+      levels = c("Nativos de IA", "Amenazados por IA", "Técnicos / Infraestructura")
+    )
+  )
+
+
+df_ia_rol %>%
+  group_by(anio, categoria_rol) %>%
+  summarise(uso_ia_medio = mean(uso_ia, na.rm = TRUE), .groups = "drop") %>%
+  ggplot(aes(x = anio, y = uso_ia_medio, color = categoria_rol, group = categoria_rol)) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 3) +
+  scale_color_manual(values = c(
+    "Nativos de IA"              = "steelblue",
+    "Amenazados por IA"          = "tomato",
+    "Técnicos / Infraestructura" = "gray50"
+  )) +
+  labs(
+    title = "¿Los roles amenazados adoptaron IA más rápido?",
+    subtitle = "Evolución del uso promedio de IA por categoría de rol",
+    x = "Año",
+    y = "Uso promedio de IA (escala)",
+    color = NULL
+  ) +
+  theme_minimal()
+
+
+df_ia_rol %>%
+  group_by(trabajo_de) %>%
+  mutate(mediana_uso = median(uso_ia, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(aes(
+    x    = reorder(trabajo_de, mediana_uso),
+    y    = uso_ia,
+    fill = categoria_rol
+  )) +
+  geom_boxplot(alpha = 0.7, outlier.alpha = 0.3) +
+  coord_flip() +
+  scale_fill_manual(values = c(
+    "Nativos de IA"              = "steelblue",
+    "Amenazados por IA"          = "tomato",
+    "Técnicos / Infraestructura" = "gray70"
+  )) +
+  labs(
+    title = "Uso de IA por rol individual",
+    subtitle = "Ordenado por mediana — color según exposición a la automatización",
+    x = NULL,
+    y = "Uso de IA (escala)",
+    fill = NULL
+  ) +
+  theme_minimal()
+
 
 
 

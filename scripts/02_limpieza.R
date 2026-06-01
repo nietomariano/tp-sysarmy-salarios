@@ -19,6 +19,8 @@ dim(df_sysarmy)
 # -----------------------------------------------------------------------------
 # 2. LIMPIEZA DE TIPOS
 # -----------------------------------------------------------------------------
+# Debbugueando
+cat("Cantidad de registros:", nrow(df_sysarmy), "\n") # 75.649
 
 # Las variables numéricas llegan como character por formatos inconsistentes
 # entre encuestas — parse_number extrae el número ignorando símbolos y separadores
@@ -62,6 +64,7 @@ na_despues - na_antes
 # VERIFICACIÓN Y ELIMINACIÓN DE DUPLICADOS
 # -----------------------------------------------------------------------------
 
+
 filas_totales <- nrow(df_sysarmy)
 filas_unicas  <- nrow(distinct(df_sysarmy))
 duplicados    <- filas_totales - filas_unicas
@@ -75,8 +78,8 @@ cat("Duplicados:", duplicados, "\n")
 df_sysarmy <- df_sysarmy %>%
   distinct()
 
-nrow(df_sysarmy)  # 75.359 observaciones finales
-
+# Debbugueando
+cat("Cantidad de registros:", nrow(df_sysarmy), "\n") # 75.359
 
 # -----------------------------------------------------------------------------
 # 3. DEFINICIÓN DE ROLES A INCLUIR
@@ -86,49 +89,92 @@ nrow(df_sysarmy)  # 75.359 observaciones finales
 # Los strings deben coincidir exactamente con los valores de la columna trabajo_de
 # Si no matchean se pierdan observaciones silenciosamente
 
-roles_core <- c(
+roles_datos <- c(
   "Data Scientist",
   "Data Engineer",
   "BI Analyst / Data Analyst",
   "AI Engineer",
-  "AI / Prompt / Chatbots"
+  "AI / Prompt / Chatbots",
+  "Data Scientist / Data Engineer",   
+  "Machine Learning Engineer",
+  "MLOps",
+  "NLP",
+  "Analytics Engineer",              
+  "Data Visualization Engineer",
+  "Data Visualization",
+  "Data Governance / GRC",
+  "DataOps",
+  "Data Architect",
+  "Business Analyst"
 )
 
-roles_data_platform <- c(
+
+roles_infraestructura <- c(
   "SysAdmin / DevOps / SRE",
   "DBA",
-  "Infraestructura"
+  "DBA (Database Administrator)",
+  "Infraestructura",
+  "Infrasctruture Engineer",          
+  "Architect",
+  "Cloud Engineer",
+  "DevOps Engineer",
+  "DevOps",
+  "SRE (Site Reliability Engineer)",
+  "SysAdmin",
+  "Storage / Backup",
+  "Networking",
+  "Middleware"
 )
 
-roles_analytics <- c(
-  "Business Analyst",
-  "Functional Analyst",
-  "Automation / RPA",
-  "Product Analyst",
-  "Analista de Procesos"
-)
 
-roles_governance <- c(
-  "Data Governance / GRC",
+
+roles_ciberseguridad <- c(
   "Infosec",
   "IT Security",
   "Analista de Cyberseguridad",
   "Analista de seguridad",
-  "Business Continuity Analyst"
+  "Business Continuity Analyst",
+  "Cybersecurity",
+  "Ciberseguridad",
+  "Security",
+  "Security Analyst",
+  "Security Engineer",
+  "SOC Analyst",
+  "Pentester"
 )
+
+roles_desarrollo <- c(
+  "Developer",
+  "QA / Tester",
+  "Consultant",
+  "Software Engineer",
+  "Analista Funcional",
+  "Analista funcional"
+)
+
+
+roles_liderazgo <- c(
+  "Technical Leader",
+  "Manager / Director",
+  "Project Manager",
+  "Scrum Master",
+  "VP / C-Level"
+)
+
+# Datos: Data Governance, GRC
+# Ciberseguridad: el resto
+# Developer, QA / Tester, Consultant -> Desarrollador
+# Technical Leadr, Manager / director, Project Manager, SCRUM Master
+# Product Manager en negocio
+# Aechitect en Arquitectura
 
 todos_los_roles <- c(
-  roles_core,
-  roles_data_platform,
-  roles_analytics,
-  roles_governance
+  roles_datos,
+  roles_infraestructura,
+  roles_ciberseguridad,
+  roles_desarrollo,
+  roles_liderazgo
 )
-
-
-# Verificacion — roles definidos que no aparecen en el dataset
-roles_no_encontrados <- setdiff(todos_los_roles, unique(df_sysarmy$trabajo_de))
-roles_no_encontrados
-# Resultado: character(0) — todos los roles matchean correctamente
 
 
 
@@ -143,8 +189,16 @@ roles_no_encontrados
 df_clean <- df_sysarmy %>%
   filter(trabajo_de %in% todos_los_roles)
 
-# Verificacion de registros post-filtro
-dim(df_clean) # 15583
+# Debbugueando
+dim(df_clean) # 64897 registros , 26 columnas
+
+# Roles excluidos con mayor volumen
+df_sysarmy %>%
+  filter(!trabajo_de %in% todos_los_roles) %>%
+  count(trabajo_de, sort = TRUE) %>%
+  slice_head(n = 20) %>%
+  print(n = Inf)
+
 
 # Distribucion por grupo de rol
 # Identificamos roles con pocas observaciones
@@ -165,6 +219,8 @@ dim(df_clean) # 15540
 df_clean %>%
   count(trabajo_de, sort = TRUE)
 
+# Debugueando
+cat("Cantidad de registros:", nrow(df_clean), "\n") # 15.540
 
 # -----------------------------------------------------------------------------
 # 5. CREACIÓN DE VARIABLES PARA EL ANÁLISIS
@@ -177,20 +233,21 @@ df_clean %>%
 df_clean <- df_clean %>%
   mutate(
     grupo_rol = case_when(
-      trabajo_de %in% roles_core ~ "Data Science / AI",
-      trabajo_de %in% roles_data_platform ~ "Data Platform / MLOps",
-      trabajo_de %in% roles_analytics ~ "Analytics / Automation",
-      trabajo_de %in% roles_governance ~ "Governance / Security"
-      
+      trabajo_de %in% roles_datos          ~ "Datos / AI",
+      trabajo_de %in% roles_infraestructura ~ "Infraestructura",
+      trabajo_de %in% roles_ciberseguridad  ~ "Ciberseguridad",
+      trabajo_de %in% roles_desarrollo      ~ "Desarrollo / QA",
+      trabajo_de %in% roles_liderazgo       ~ "Management"
     ),
     
     grupo_rol = factor(
       grupo_rol,
       levels = c(
-        "Data Science / AI",
-        "Data Platform / MLOps",
-        "Analytics / Automation",
-        "Governance / Security"
+        "Datos / AI",
+        "Infraestructura",
+        "Ciberseguridad",
+        "Desarrollo / QA",
+        "Liderazgo / Management"
       )
     ),
     
@@ -252,7 +309,7 @@ df_clean <- df_clean %>%
     contrato = factor(
       contrato,
       levels = c("Staff", "Contractor", "Tercerizado", "Freelance", "Otro")
-    ),,
+    ),
     
     
     # Estandariza modalidad_trabajo en tres categorias limpias
@@ -457,8 +514,6 @@ df_clean <- df_clean %>%
     !is.na(log_sal)
   )
 
-df_clean <- df_clean%>%
-  filter(sal_usd_blue >100)
 
 # Verificación post-filtro de cantidad de observaciones finales
 cat("Observaciones después del filtro de calidad:", nrow(df_clean), "\n")
@@ -496,7 +551,8 @@ df_clean <- df_clean %>%
     valor_blue = blue_promedio
   )
 
-
+df_clean <- df_clean%>%
+  filter(sal_usd_blue >100)
 
 
 # -----------------------------------------------------------------------------

@@ -611,6 +611,12 @@ df %>%
 # queda en el extremo inferior.
 # Region y grupo de rol seran incluidos como variables de control en el modelo.
 
+
+# -----------------------------------------------------------------------------
+# 9B. USO DE IA — ADOPCIÓN Y PERFIL
+# -----------------------------------------------------------------------------
+
+
 roles_amenazados <- c("BI Analyst / Data Analyst", "Business Analyst")
 roles_nativos    <- c("Data Scientist", "AI Engineer", "AI / Prompt / Chatbots")
 roles_tecnico    <- c("Data Engineer", "SysAdmin / DevOps / SRE", "DBA")
@@ -679,6 +685,78 @@ df_ia_rol %>%
   ) +
   theme_minimal()
 
+# ADOPCION DE IA POR GRUPO DE ROL (2024-2026)
+# Todos los grupos parten de 25-37% de uso alto en 2024.1 y convergen hacia 60-70% en 2026.1
+# Datos / AI lidera desde el inicio — Desarrollo / QA arranca bajo pero termina liderando
+# Ciberseguridad es el grupo que crece más lento y se queda rezagado al final
+# La convergencia sugiere que la IA se está volviendo transversal independientemente del rol
+df %>%
+  filter(!is.na(uso_ia), !is.na(grupo_rol)) %>%
+  group_by(grupo_rol, periodo) %>%
+  summarise(
+    pct_alto_uso = mean(uso_ia >= 4, na.rm = TRUE) * 100,
+    .groups = "drop"
+  ) %>%
+  mutate(periodo = factor(periodo)) %>%  
+  ggplot(aes(x = periodo, y = pct_alto_uso, color = grupo_rol, group = grupo_rol)) +
+  geom_line(linewidth = 1.1) +
+  geom_point(size = 2.5) +
+  labs(
+    title = "¿Qué grupos adoptaron IA más rápido?",
+    subtitle = "% de encuestados con uso alto de IA (≥ 4) por período",
+    x = "Período",
+    y = "% con uso alto de IA",
+    color = "Grupo de rol"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  
+  
+# HALLAZGO CONTRAINTUITIVO: los juniors y Semi-Seniopr usan mas IA
+# Junior y Semi-Senior tienen mediana 4 — Senior tiene mediana 3
+# Los juniors entraron al mercado laboral con IA ya disponible
+# Esto sugiere que la IA está siendo incorporada de abajo hacia arriba en las organizaciones  
+df %>%
+    filter(!is.na(uso_ia), !is.na(seniority)) %>%
+    ggplot(aes(x = seniority, y = uso_ia, fill = seniority)) +
+    geom_violin(alpha = 0.7) +
+    geom_boxplot(width = 0.15, fill = "white", outlier.alpha = 0.2) +
+    labs(
+      title = "¿Los seniors usan más IA?",
+      subtitle = "Distribución del uso de IA por nivel de seniority — 2024 a 2026",
+      x = "Seniority",
+      y = "Uso de IA (escala)"
+    ) +
+    theme_minimal() +
+    theme(legend.position = "none")
+  
+  
+
+# Las tres medianas son muy similares — el uso de IA no determina el salario de forma clara
+# Alto (4-5) tiene una leve ventaja pero la diferencia es pequeña
+# Bajo (1-2) supera a Medio (3) — no hay relación lineal
+# INTERPRETACION: el uso de IA puede ser una consecuencia del rol y seniority
+# más que una causa directa del salario
+  df %>%
+    filter(!is.na(uso_ia)) %>%
+    mutate(uso_ia_grupo = case_when(
+      uso_ia <= 2 ~ "Bajo (1-2)",
+      uso_ia == 3 ~ "Medio (3)",
+      uso_ia >= 4 ~ "Alto (4-5)"
+    ),
+    uso_ia_grupo = factor(uso_ia_grupo, 
+                          levels = c("Bajo (1-2)", "Medio (3)", "Alto (4-5)"))) %>%
+    ggplot(aes(x = uso_ia_grupo, y = log_sal_usd, fill = uso_ia_grupo)) +
+    geom_boxplot() +
+    labs(
+      title = "¿Los que más usan IA ganan más?",
+      subtitle = "Distribución salarial según nivel de uso de IA — 2024 a 2026",
+      x = "Nivel de uso de IA",
+      y = "Logaritmo del salario (USD)"
+    ) +
+    theme_minimal() +
+    theme(legend.position = "none")
+  
 
 
 
@@ -707,42 +785,7 @@ df_ia_rol %>%
 # - Sin embargo la brecha persiste dentro de cada nivel de seniority
 
 
-df %>%
-  filter(!is.na(experiencia)) %>%
-  ggplot(aes(x = reorder(grupo_rol, experiencia, median),
-             y = experiencia,
-             fill = grupo_rol)) +
-  geom_violin(alpha = 0.7) +
-  geom_boxplot(width = 0.15, fill = "white", outlier.alpha = 0.2) +
-  labs(
-    title = "Distribución de experiencia por grupo de rol",
-    x = "Grupo de rol",
-    y = "Años de experiencia"
-  ) +
-  theme_minimal() +
-  theme(
-    legend.position = "none",
-    axis.text.x = element_text(angle = 15, hjust = 1)
-  )
 
-
-df %>% filter(anio == 2026) %>% count(grupo_rol)
-
-df %>%
-  filter(genero_simple %in% c("Hombre", "Mujer")) %>%
-  group_by(anio, genero_simple) %>%
-  summarise(mediana_usd = median(sal_usd_blue, na.rm = TRUE), .groups = "drop") %>%
-  ggplot(aes(x = anio, y = mediana_usd, color = genero_simple, group = genero_simple)) +
-  geom_line(linewidth = 1.2) +
-  geom_point(size = 3) +
-  labs(
-    title = "Evolución de la brecha salarial por género",
-    subtitle = "Salario mediano en USD — 2019 a 2026",
-    x = "Año",
-    y = "Salario mediano (USD)",
-    color = "Género"
-  ) +
-  theme_minimal()
 
 # DECISION DE MODELADO:
 # - Variable objetivo: log_sal_usd — salario deflactado por dolar blue

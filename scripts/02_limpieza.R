@@ -182,13 +182,12 @@ todos_los_roles <- c(
 
 
 # Se filtra conservando solo los roles del sector data y tecnologia
-# El dataset pasa de 75.359 a aproximadamente 15583 observaciones y luego
-# a 1540 post eliminar roles con menos de 10 observaciones.
+# El dataset pasa de 75.359 a aproximadamente 62757 observaciones
 df_clean <- df_sysarmy %>%
   filter(trabajo_de %in% todos_los_roles)
 
 # Debbugueando
-dim(df_clean) # 64897 registros , 26 columnas
+dim(df_clean) # 62757 registros , 26 columnas
 
 # Roles excluidos con mayor volumen
 df_sysarmy %>%

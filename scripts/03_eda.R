@@ -77,35 +77,35 @@ df %>%
 ### VARIABLES CATEGORICAS
 
 # grupo_rol — los grupos ahora son: Datos/AI, Infraestructura, Ciberseguridad,
-# Desarrollo/QA representan el ~52% del dataset
+# Desarrollo/QA representan el ~54% del dataset
 df %>%
   count(grupo_rol)%>%
   mutate(
     porcentaje = round(n/sum(n)*100,1)
   )
 
-# Distribución de seniority — Nota: ~67% NA corresponden a períodos 2019-2023
+# Distribución de seniority — Nota: ~72% NA corresponden a períodos 2019-2023
 df %>%
   count(seniority)%>%
   mutate(
     porcentaje = round(n/sum(n)*100,1)
   )
 
-# genero_simple — Nota: ~82% Hombre, representación femenina baja (14%)
+# genero_simple — Nota: ~82% Hombres, representacion femenina baja (~14%)
 df %>%
   count(genero_simple)%>%
   mutate(
     porcentaje = round(n/sum(n)*100,1)
   )
 
-# modalidad — Nota: ~46% NA (períodos pre-2022); entre los disponibles, 50% remoto
+# modalidad — Nota: ~49% NA (períodos pre-2022); entre los disponibles, ~29% remoto
 df %>%
   count(modalidad)%>%
   mutate(
     porcentaje = round(n/sum(n)*100,1)
   )
 
-# gente_a_cargo_grupo — Nota: ~80% sin equipo a cargo
+# gente_a_cargo_grupo — Nota: ~74% sin equipo a cargo
 df %>%
   count(gente_a_cargo_grupo)%>%
   mutate(
@@ -118,19 +118,19 @@ df %>%
 # sal_bruto: distribucion asimetrica en pesos — no comparable entre periodos por inflacion
 summary(df$sal_bruto)
 
-# sal_usd_blue: salario deflactado por dolar blue — comparable entre 2019 y 2026
+# sal_usd_blue: salario calculado por dolar blue — comparable entre 2019 y 2026
 summary(df$sal_usd_blue)
 
 # log_sal_usd: media y mediana mas cercanas — confirma uso de log como variable objetivo
 summary(df$log_sal_usd)
 
-# experiencia: mediana 6 anios, máximo 65 — posible outlier en el maximo
+# experiencia: mediana 6 anios, maximo 45
 summary(df$experiencia)
 
-# edad: rango 18-70, algunos NA — filtro aplicado en limpieza (16-70)
+# edad: rango 16-70, mediana 32
 summary(df$edad)
 
-# gente_a_cargo: mediana 0, media 0.74 — 80% sin equipo, distribucion muy sesgada
+# gente_a_cargo: mediana 0, media 0  — ~74% sin equipo, distribucion muy sesgada
 summary(df$gente_a_cargo)
 
 
@@ -192,7 +192,7 @@ ggplot(df, aes(x = log_sal_usd)) +
 
 
 
-# Boxplot
+# Boxplot log_sal_usd — mediana ~7, IQR entre 6.5 y 7.5
 ggplot(df, aes(y = log_sal_usd)) +
   geom_boxplot(fill = "steelblue") +
   labs(
@@ -226,7 +226,7 @@ ggplot(df, aes(x = experiencia, y = log_sal_usd)) +
 
 
 # Relacion entre Edad y salario
-# Tendencia positiva similar a experiencia pero con mayor dispersion
+# Tendencia positiva similar a experiencia
 # Edad y experiencia probablemente correlacionadas — riesgo de multicolinealidad
 # Se evaluara incluir solo una de las dos en el modelo final
 ggplot(df, aes(x = edad, y = log_sal_usd)) +
@@ -306,7 +306,7 @@ df %>%
 # SENIORITY
 # Variable con separación clara entre los tres niveles
 # Medianas crecen progresivamente: Junior < Semi-Senior < Senior
-# Senior tiene levemente la caja con mayor dispersión
+# Senior tiene la caja con mayor dispersión
 ggplot(df %>% filter(!is.na(seniority)), 
        aes(x = seniority, y = log_sal_usd, fill = seniority)) +
   geom_boxplot() +
@@ -334,9 +334,10 @@ ggplot(df %>% filter(!is.na(modalidad)),
   theme_minimal()
 
 
-# DOLARIZACION
-# Con salario deflactado la brecha se achica — quienes cobran en dolares
-# ya estan capturados en la misma escala que el resto
+# SUELDOS DOLARIZADOS VS NO
+# Dolarizados muestran mediana y Q3 superiores a no dolarizados
+# La brecha persiste al deflactar — cobrar en dolares tiene efecto real sobre el salario
+# Mayor dispersión en dolarizados — los salarios en ese grupo varían más entre sí
 ggplot(df %>% filter(!is.na(sueldo_dolarizado)),
        aes(x = factor(sueldo_dolarizado, 
                       labels = c("No dolarizado", "Dolarizado")),
@@ -448,7 +449,7 @@ df %>%
 
 
 # GENERO
-# Sin controlar por seniority — hombres muestran mediana levemente superior
+# Sin controlar por seniority — hombres muestran mediana visiblemente superior
 # Podría sugerir una brecha salarial de género, pero es necesario controlar
 # por otras variables antes de concluir
 ggplot(df,
@@ -462,12 +463,10 @@ ggplot(df,
   theme_minimal()
 
 
-# Controlando por seniority — persiste una brecha salarial a favor de hombres
-# especialmente visible en Semi-Senior y Senior
-# El genero tiene un efecto independiente del seniority
-# Esto sugiere incluir genero_simple en el modelo para cuantificar su efecto real
-# Filtramos otro / no binario porque para obtener una mejor visualizacion ya que 
-# no entra en nuestro analisis en este caso
+# Al controlar por seniority las diferencias salariales entre generos se reducen notablemente
+# Las cajas de Hombre y Mujer se solapan dentro de cada nivel — medianas muy similares
+# Sugiere que la brecha observada sin controlar se explica principalmente por la distribución
+# de seniority: más hombres en Senior que mujeres
 ggplot(df %>% filter(!is.na(seniority), 
                      genero_simple %in% c("Hombre", "Mujer")),
 
@@ -484,11 +483,9 @@ ggplot(df %>% filter(!is.na(seniority),
 
 
 
-# Hombres tienen mayor proporcion de Senior (~53%) vs mujeres (~35%)
+# Hombres tienen mayor proporcion de Senior (~58%) vs mujeres (~40%)
 # Mujeres tienen mayor proporcion de Junior y Semi-Senior
-# La distribucion de seniority amplifica la brecha pero no la explica completamente
-# — la diferencia persiste dentro de cada nivel de seniority
-# Filtramos no binario / otro porque no nos interesa en este analisis
+# La distribucion de seniority explica gran parte de la brecha salarial entre generos
 ggplot(df %>% filter(!is.na(seniority),
                      genero_simple %in% c("Hombre", "Mujer")),
        
@@ -513,6 +510,8 @@ df %>%
   ) %>%
   arrange(desc(mediana_usd))
   
+
+
 
 # CONCLUSION SECCION 8:
 # El genero muestra una brecha salarial a favor de hombres incluso controlando
@@ -541,16 +540,17 @@ ggplot(df %>% filter(!is.na(region)),
   ) +
   theme_minimal()
 
+
+# Tabla de apoyo
 df %>% count(region)
 
 
 
 # SALARIO SEGUN GRUPO DE ROL
-# Medianas muy similares entre todos los grupos en USD
-# Management supera al resto. Ciberseguridad  e Infraestructura tiene una leve ventaja sobre las demas
-# Desarrollo tiene la mediana mas baja de todas
-# El grupo de rol puede actuar como variable de control en el modelo
-
+# Roles de gestión lidera con mediana claramente superior al resto
+# Ciberseguridad segunda, seguida de cerca por Infraestructura y Datos / AI
+# Desarrollo / QA tiene la mediana más baja de todos los grupos
+# Las diferencias entre los grupos del medio son pequeñas
 ggplot(df,
        aes(x = reorder(grupo_rol, log_sal_usd, median),
            y = log_sal_usd,
@@ -567,16 +567,18 @@ ggplot(df,
     axis.text.x = element_text(angle = 15, hjust = 1)
   )
 
-# TOP ROLES
-# Manager / Director y Architect lideran con las medianas más altas
-# QA / Tester y Consultant quedan en el extremo inferior
-# Management (violeta) concentra los roles mejor pagos
-# El puesto especifico tiene menor poder explicativo que seniority
+# TOP 10 PUESTOS
+# Top 10 roles por cantidad de observaciones en el dataset
 top_roles <- df %>%
   count(trabajo_de, sort = TRUE) %>%
   slice_head(n = 10) %>%
   pull(trabajo_de)
 
+# Boxplot de salario por rol — ordenado por mediana, coloreado por grupo
+# Los 3 puestos mejor pagos son de gestion e infraestructura: Manager/Director, Architect y Technical Leader
+# Los roles de Datos/AI (Business Analyst, BI Analyst, Data analyst) se ubican en la mitad baja
+# QA/Tester tiene la mediana mas baja — Desarrollo/QA concentra los roles peor pagos
+# Developer tiene alta dispersion hacia la derecha — outliers de salarios muy altos
 ggplot(df %>% filter(trabajo_de %in% top_roles),
        aes(x = reorder(trabajo_de, log_sal_usd, median),
            y = log_sal_usd,
@@ -592,12 +594,34 @@ ggplot(df %>% filter(trabajo_de %in% top_roles),
   theme_minimal()
 
 
-# Desarrollo/QA y Datos/AI muestran la pendiente más pronunciada —
-# la experiencia premia más en esos grupos
-# Management parte con el intercepto más alto (salario base mayor)
-# Infraestructura crece más lento con la experiencia
+# Desarrollo/QA tiene la pendiente más pronunciada — la experiencia premia mas en ese grupo
+# Roles de gestion arranca con el intercepto mas alto — salario base superior desde el inicio
+# Infraestructura tiene la pendiente mas baja — la experiencia premia menos
+# Ciberseguridad y Datos/AI muestran pendientes similares y convergen al final
 df %>%
   filter(!is.na(experiencia), !is.na(log_sal_usd)) %>%
+  ggplot(aes(x = experiencia, y = log_sal_usd, color = grupo_rol)) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    title = "Salario vs Experiencia por grupo de rol",
+    x     = "Años de experiencia",
+    y     = "Logaritmo del salario (USD)",
+    color = "Grupo de rol"
+  ) +
+  theme_minimal()
+
+
+# Se excluye Roles de gestion de la comparacion
+# Para ver diferencia unicamente entre grupos tecnicos
+
+# Ciberseguridad y Datos/AI muestran pendientes muy similares y arrancan desde el mismo punto
+# Infraestructura tiene la pendiente mas baja y el intercepto mas bajo — crece más lento
+# Desarrollo/QA tiene el intercepto mas bajo pero la pendiente mas alta —
+# arranca peor pagado que el resto pero la experiencia lo premia mas que a cualquier otro grupo
+# Un perfil senior de Desarrollo/QA termina igualando o superando a Ciberseguridad y Datos/AI
+df %>%
+  filter(!is.na(experiencia), !is.na(log_sal_usd),
+         grupo_rol != "Roles de gestión") %>%
   ggplot(aes(x = experiencia, y = log_sal_usd, color = grupo_rol)) +
   geom_smooth(method = "lm", se = FALSE) +
   labs(
@@ -613,10 +637,11 @@ df %>%
 # CONCLUSION SECCION 9:
 # Las diferencias regionales son pequeñas en USD — mercado IT homogeneo geograficamente.
 # CABA tiene una leve ventaja pero no es determinante.
-# Entre grupos de rol las diferencias tambien son moderadas.
-# AI Engineer lidera entre roles individuales, BI Analyst / Data Analyst 
-# queda en el extremo inferior.
-# Region y grupo de rol seran incluidos como variables de control en el modelo.
+# Roles de gestion lidera entre grupos — Desarrollo/QA queda en el extremo inferior.
+# A nivel de rol individual, Manager/Director y Architect son los mejor pagos.
+# QA/Tester y Consultant son los peor pagos del top 10.
+# La experiencia premia más en Desarrollo/QA — Infraestructura crece mas lento.
+# Region y grupo de rol serán incluidos como variables de control en el modelo.
 
 
 # -----------------------------------------------------------------------------

@@ -77,7 +77,8 @@ tp-sysarmy-salarios/
 │   └── 04_modelado.R
 │
 │── docs/
-│   └── Documentacion_eda.docx
+│   ├── Documentacion_eda.docx
+│   └── Documentacion_limpieza.docx
 │         
 ├── outputs/
 │   ├── figures/

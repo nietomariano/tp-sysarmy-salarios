@@ -39,7 +39,7 @@ H6. La modalidad de trabajo (remoto, híbrido, presencial) no tiene efecto signi
 
 La variable objetivo utilizada para el modelado es:
 
-log_sal = log(salario_bruto)
+log_sal_usd = log(salario_bruto_usd)
 
 Se utiliza la transformación logarítmica para reducir la asimetría presente en la distribución salarial y cumplir mejor los supuestos de los modelos de regresión lineal.
 

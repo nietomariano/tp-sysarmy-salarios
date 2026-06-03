@@ -6,7 +6,6 @@ df <- read_csv(
 
 
 # Ajustando datasets y NA (toma desde el año 2024)
-
 df_modelo <- df %>%
   drop_na(log_sal_usd, experiencia, grupo_rol, seniority, 
           sueldo_dolarizado, genero_simple, region)
@@ -23,54 +22,51 @@ dim(df_modelo)
 
 #Preguntas a responder con los modelos:
 
-#Como afecta la experiencia al salario?
-#Como afecta la modalidad al salario?
-#El valor de un anio de experiencia cambia segun la modalidad?
+# - Que rol maximiza el salario en dolares en el sector IT argentino,
+#   controlando por experiencia, region y genero?
+# - El valor de un anioo de experiencia cambia segun si se cobra en dolares o no?
+# - La relacion entre experiencia y salario es lineal o presenta rendimientos decrecientes?
 
-# PREGUNTAS para generar hipotesis.. 
-#
-# Que rol maximiza el salario en dolares en el sector IT argentino, controlando por experiencia, region y genero?
-# Que rol y nivel de seniority  maximiza el salario en dolares en el sector IT argentino, controlando por experiencia, region y genero?
-#
-# Yendo por esas preguntas quizas un modelo podria ser:
-# Modelo 1 log_sal_usd ~ experiencia + grupo_rol + genero_simple + region + gente_a_cargo ??
-# Modelo 2 —  agregar seniority + sueldo_dolarizado  ??
-#
 
 
 # ---
-#### Modelo 1: Salarios según la experiencia, grupo rol, seniority ####
+#### Modelo 1: log_sal_usd ~ experiencia + grupo_rol + seniority + genero_simple + region ####
 modp1 <- lm(log_sal_usd ~ experiencia + grupo_rol + seniority + genero_simple + region,
             data = df_modelo)
 
 summary(modp1)
 
-#### Observaciones mod1: ####
-#   (Multiple R-squared): El valor es 0.2541
-#   Esto significa que el modelo logra capturar y explicar el 25.41% de la variabilidad 
-#   de los salarios
-#   El ~75% restante se debe a la dispersión natural de los sueldos y a factores
-#   que aún no se incluyeron (como la dolarización).
+#### Observaciones modp1: ####
+# R2 = 0.2881: el modelo explica el 28.81% de la variabilidad de los salarios.
+# El ~71% restante se debe a dispersion natural y factores no incluidos (como dolarizacion).
 
-# Error residual (Residual standard error): Es 0.552 indica que, en promedio, 
-# las predicciones del modelo 1 se desvían de los salarios reales en 0.552 unidades logarítmicas
+# RSE = 0.552: las predicciones se desvian en promedio 0.552 unidades logaritmicas.
 
-# El (Intercept) de 7.027 es el salario base estimado, corresponde a un profesional 
-# con 0 años de experiencia, con seniority Junior, y de un grupo de rol de referencia 
-# (Ciberseguridad)
+# Intercepto = 7.1084: salario base estimado para un hombre Junior de Ciberseguridad en CABA
+# con 0 anios de experiencia.
 
-# Impacto de las variables
+# Experiencia: coeficiente 0.0052 — por cada anio adicional, el salario sube ~0.52%.
 
-# Experiencia: Su coeficiente es 0.0066. Por cada año adicional de experiencia, 
-# el salario aumenta en promedio un 0.66%.
+# Seniority (mayores saltos del modelo):
+# - Semi-Senior: coef 0.4770 → sube ~61% respecto a Junior  (e^0.477 - 1)
+# - Senior:      coef 0.7716 → sube ~116% respecto a Junior (e^0.772 - 1)
 
-# Seniority (los mayores saltos): Comparado con ser Junior, ascender a Semi-Senior
-# aumenta el sueldo en aproximadamente un 49.1% (coeficiente 0.4912). Ascender a 
-# Senior lo incrementa un 79.4% respecto a la base (coeficiente 0.7940).
+# Grupo de rol (referencia = Ciberseguridad):
+# - Datos / AI:      coef -0.050 → ~4.9% menos  (no significativo al 5%)
+# - Infraestructura: coef -0.137 → ~12.8% menos (***)
+# - Desarrollo / QA: coef -0.135 → ~12.6% menos (***)
+# - Roles de gestion: coef +0.138 → ~14.8% mas  (***)
 
-# Grupo Rol: Los coeficientes negativos indican que ganan menos que el rol de 
-# referencia. El perfil de Datos / AI gana un 6.8% menos (coeficiente -0.068), 
-# Infraestructura un 15% menos, y Desarrollo / QA un 15.3% menos.
+# Genero:
+# - Mujer: coef -0.111 → ~10.5% menos que hombres (***)
+
+# Region (referencia = CABA):
+# - GBA / Prov. BA: coef -0.062 → ~6.0% menos (***)
+# - Interior:       coef -0.123 → ~11.6% menos (***)
+
+
+
+
 
 #### GRAFICOS MODELO 1 ####
 
@@ -78,8 +74,7 @@ summary(modp1)
 # GRÁFICO 1: VISUALIZACIÓN DEL MODELO (Predicciones)
 # ---------------------------------------------------------
 
-# Creamos una grilla con todas las combinaciones posibles de nuestras variables
-# Usamos seq_range para generar una secuencia suave de años de experiencia
+# Grilla fijando genero = Hombre y region = CABA para aislar el efecto de rol y seniority
 grilla_modp1 <- df_modelo %>%
   data_grid(
     experiencia = seq_range(experiencia, n = 50),
@@ -88,10 +83,11 @@ grilla_modp1 <- df_modelo %>%
     genero_simple = "Hombre",
     region = "CABA"
   ) %>%
-  add_predictions(modp1, var = "pred") # Agregamos la predicción del modelo 1
+  add_predictions(modp1, var = "pred") 
 
 
-# Graficamos los datos reales y le superponemos las rectas de las predicciones
+# Rectas paralelas por seniority dentro de cada grupo de rol —
+# el modelo lineal asume que la pendiente de experiencia es igual para todos los grupos
 ggplot(df_modelo, aes(x = experiencia, y = log_sal_usd)) +
   geom_point(alpha = 0.2, color = "black") +
   geom_line(data = grilla_modp1, aes(y = pred, color = seniority), size = 1) +
@@ -111,12 +107,13 @@ ggplot(df_modelo, aes(x = experiencia, y = log_sal_usd)) +
 # GRÁFICO 2: DIAGNÓSTICO DE RESIDUOS (Residuos vs Predicciones)
 # ---------------------------------------------------------
 
-# Calculamos predicciones y residuos sobre los datos reales
+# Residuos centrados en 0 — sin patron sistematico claro
+# La dispersion aumenta levemente en predicciones intermedias (~7.5)
+# El modelo 1 deja estructura sin capturar en la zona de valores medios
 df_residuos_p1 <- df_modelo %>%
   add_predictions(modp1, var = "pred") %>%
   add_residuals(modp1, var = "resid")
 
-# Graficamos
 ggplot(df_residuos_p1, aes(x = pred, y = resid)) +
   geom_point(alpha = 0.3, color = "black") +
   geom_hline(yintercept = 0, color = "red", size = 1) +
@@ -128,57 +125,53 @@ ggplot(df_residuos_p1, aes(x = pred, y = resid)) +
   theme_minimal()
 
 
-#### Modelo 2: Salarios según la experiencia con interaccion sueldo_dolarizado, grupo rol, seniority ####
+
+#### Modelo 2: experiencia * sueldo_dolarizado + grupo_rol + seniority + genero_simple + region ####
 modp2 <- lm(log_sal_usd ~ experiencia * sueldo_dolarizado + grupo_rol + seniority + genero_simple + region,
             data = df_modelo)
 
 summary(modp2)
 
-#### Observaciones mod2: ####
-# El Multiple R-squared saltó a 0.3109.
-# El Modelo 1 explicaba el 25.41% de los salarios, el modelo 2 ahora captura el
-# 31.09% de la variabilidad. 
+#### Observaciones modp2: ####
+# R² sube de 0.2881 a 0.3373: agregar la dolarizacion y su interaccion con experiencia
+# aporta ~5 puntos porcentuales de explicacion adicional.
 
-# El Residual standard error bajó de 0.552 a 0.5305
-# Esto indica que, al sumar la dolarización y su interacción, las predicciones de 
-# este modelo se equivocan menos (los errores se achicaron).
+# RSE baja de 0.552 a 0.533: las predicciones mejoran al incorporar la dolarizacion.
 
-# Interaccion entre variables
-# experiencia:sueldo_dolarizadoTRUE: Su p-valor es < 2e-16 (tiene ***), lo que 
-# confirma que la interacción es altamente significativa
-# El efecto de la experiencia depende definitivamente de si cobrás en dólares o no.
+# Interaccion experiencia:sueldo_dolarizadoTRUE — altamente significativa (***)
+# El efecto de la experiencia sobre el salario depende de si se cobra en dolares o no:
 
-# Para sueldos en Pesos: La pendiente está dada por el coeficiente experiencia 
-# (0.003985). Es decir, por cada año extra, el sueldo en pesos crece apenas un ~0.4%.
+# - Sueldos en pesos: pendiente = 0.003748 → cada año extra sube ~0.37%
+# - Sueldos dolarizados: pendiente = 0.003748 + 0.012820 = 0.016568 → cada año extra sube ~1.66%
+# La experiencia rinde ~4.4 veces mas rapido para quienes cobran en dolares.
 
-# Para sueldos Dolarizados: La pendiente es la suma de la base más la interacción
-# (0.003985 + 0.017400 = 0.021385). Por cada año extra, el sueldo dolarizado crece 
-# en promedio un ~2.14%. La experiencia "paga" o rinde más de 5 veces más rápido 
-# a largo plazo si trabajás para el exterior.
+# Efecto base de dolarizacion (sueldo_dolarizadoTRUE = 0.1738):
+# A 0 años de experiencia, cobrar en dolares implica ~19% mas de salario (e^0.1738 - 1).
 
-# El término sueldo_dolarizadoTRUE (0.157370) también es muy significativo (***).
-# Esto dice que, en el punto de partida (a los 0 años de experiencia, comparando 
-# dos Juniors del mismo rol), el mero hecho de tener el sueldo dolarizado incrementa 
-# el salario en aproximadamente un 15.7% respecto a la base en pesos.
+# Seniority:
+# - Semi-Senior: coef 0.4512 → ~57% mas que Junior  (e^0.451 - 1)
+# - Senior:      coef 0.6992 → ~101% mas que Junior (e^0.699 - 1)
 
-# El resto de las variables (Seniority y Rol):
-# Las variables estructurales que traíamos del mod1 se ajustaron levemente pero 
-# siguen siendo estadísticamente significativas (***)
+# Grupo de rol (referencia = Ciberseguridad):
+# - Datos / AI:      coef -0.068 → ~6.6% menos (*)
+# - Infraestructura: coef -0.136 → ~12.7% menos (***)
+# - Desarrollo / QA: coef -0.171 → ~15.7% menos (***)
+# - Roles de gestion: coef +0.112 → ~11.8% mas  (***)
 
-# Manteniendo todo constante, ser Senior aumenta el sueldo en un enorme ~71.7% 
-# (coeficiente 0.7176) frente a un Junior, y ser Semi-Senior un ~46.6%
+# Genero: Mujer coef -0.106 → ~10.1% menos (***)
+# Region: GBA -0.079 → ~7.6% menos | Interior -0.134 → ~12.6% menos (***)
 
-# Los roles mantienen la misma lógica: Desarrollo/QA (-19.6%), 
-# Infraestructura (-15.3%) y Datos/AI (-8.8%) ganan menos que el rol base 
-# "Otros" / Analytics
+
+
+
 
 #### GRAFICOS MODELO 2 ####
 # ---------------------------------------------------------
-# GRÁFICO 1: VISUALIZACIÓN DEL MODELO 2 (Predicciones)
+# GRAFICO 1: VISUALIZACION DEL MODELO 2 (Predicciones)
 # ---------------------------------------------------------
 
-# 1. Creamos la grilla agregando 'sueldo_dolarizado'
-grilla_modp2 <- df_modelo %>%
+# La separacion entre curvas rojas (pesos) y turquesa (dolares) crece con la experiencia
+# ilustra la interaccion: cobrar en dolares premia cada vez mas con los anios
   data_grid(
     experiencia = seq_range(experiencia, n = 50),
     grupo_rol,
@@ -189,7 +182,8 @@ grilla_modp2 <- df_modelo %>%
   ) %>%
   add_predictions(modp2, var = "pred")
 
-# 2. Graficamos superponiendo las rectas al scatter plot
+
+
 ggplot(df_modelo, aes(x = experiencia, y = log_sal_usd)) +
   geom_point(alpha = 0.2, color = "black") +
   geom_line(data = grilla_modp2, aes(y = pred, color = sueldo_dolarizado, linetype = seniority), size = 1) +
@@ -205,15 +199,16 @@ ggplot(df_modelo, aes(x = experiencia, y = log_sal_usd)) +
   theme_bw()
 
 # ---------------------------------------------------------
-# GRÁFICO 2: DIAGNÓSTICO DE RESIDUOS (mod2)
+# GRAFICO 2: DIAGNOTICO DE RESIDUOS (mod2)
 # ---------------------------------------------------------
 
-# Calculamos predicciones y residuos sobre los datos reales
-df_residuos_p2 <- df_modelo %>%
+# Residuos mas simetricos que modp1, la nube se compacta hacia el centro
+# Persiste leve dispersion en predicciones bajas (~7.0)
   add_predictions(modp2, var = "pred") %>%
   add_residuals(modp2, var = "resid")
 
-# Graficamos los residuos
+
+
 ggplot(df_residuos_p2, aes(x = pred, y = resid)) +
   geom_point(alpha = 0.3, color = "black") +
   geom_hline(yintercept = 0, color = "red", size = 1) +
@@ -224,60 +219,54 @@ ggplot(df_residuos_p2, aes(x = pred, y = resid)) +
   ) +
   theme_minimal()
 
-#### Modelo 3: Probando experiencia con poly y su interaccion con dolarizado + grupo rol + seniority ####
+
+#### Modelo 3: poly(experiencia, 2) * sueldo_dolarizado + grupo_rol + seniority + genero_simple + region ####
 modp3 <- lm(log_sal_usd ~ poly(experiencia, 2) * sueldo_dolarizado + grupo_rol + seniority + genero_simple + region,
             data = df_modelo)
 
 summary(modp3)
 
-#### Observaciones mod3: ####
-# El Modelo 2 explicaba el 31.09% de la varianza. Al permitir que la experiencia 
-# se curve, el Multiple R-squared subió a 0.3189 (casi 32%).
-# El error residual bajó aún más, llegando a 0.5275.
+#### Observaciones modp3: ####
+# R² sube de 0.3373 a 0.3454: permitir curvatura en la experiencia agrega ~1 punto adicional.
+# RSE baja de 0.533 a 0.530.
 
-## Terminos cuadraticos:
-# poly(experiencia, 2) R dividió la experiencia en dos componentes: el componente 
-# lineal (la tendencia general de subida) y el componente cuadrático 
-# (la concavidad o curvatura).
+# Terminos polinomicos de experiencia:
+# - poly(experiencia,2)1 positivo y significativo: tendencia general creciente.
+# - poly(experiencia,2)2 = -7.076, negativo y significativo: curva con forma de U invertida.
+#   Los salarios crecen rapido en los primeros años pero se desaceleran y alcanzan
+#   un techo alrededor de los 20-30 años de experiencia.
 
-# poly(experiencia, 2)1 (Positivo y significativo): Confirma que la tendencia general
-# a lo largo del tiempo es que el sueldo suba.
+# Interaccion polinomica con dolarizacion — ambos terminos altamente significativos (***):
+# Los dolarizados no solo tienen una pendiente inicial mas alta, sino que la forma
+# de la curva es matematicamente distinta: el techo es mas alto y se alcanza mas tarde.
 
-# poly(experiencia, 2)2 (-6.534, negativo y significativo): El signo negativo 
-# indica que la curva tiene forma de "U invertida" o parábola cóncava. 
-# Matemáticamente, demuestra lo que vimos en el gráfico de Salario vs. Experiencia,
-# los sueldos crecen muy rápido en los primeros años, pero luego se 
-# desaceleran y alcanzan un "techo" a medida que los profesionales llegan a los 
-# 20 o 30 años de experiencia.
+# Ajuste de seniority al capturar mejor la experiencia:
+# - Semi-Senior: coef 0.3790 → ~46% mas que Junior  (e^0.379 - 1)
+# - Senior:      coef 0.4949 → ~64% mas que Junior  (e^0.495 - 1)
+# Al modelar la curvatura real de la experiencia, el modelo ya no necesita "inflar"
+# el coeficiente de seniority para compensar — los saltos son mas precisos.
 
-## La Interacción Polinómica con la Dolarización 
-# El modelo demuestra que la forma de la curva cambia según la moneda.
-# Los términos poly(...)1:sueldo_dolarizadoTRUE y poly(...)2:sueldo_dolarizadoTRUE 
-# son altísimamente significativos (***).
-# Esto significa que si cobras en dólares, no solo la pendiente inicial es más 
-# agresiva (crece más rápido), sino que la forma en la que el sueldo se va 
-# "estancando" a lo largo de los años sigue una curvatura matemáticamente 
-# distinta a la de los sueldos en pesos.
+# Grupo de rol (referencia = Ciberseguridad):
+# - Datos / AI:      coef -0.059 → ~5.7% menos (*)
+# - Infraestructura: coef -0.140 → ~13.1% menos (***)
+# - Desarrollo / QA: coef -0.166 → ~15.3% menos (***)
+# - Roles de gestion: coef +0.112 → ~11.8% mas  (***)
 
-## El resto de las variables
-# El seniority y el grupo de rol siguen siendo muy significativos. Un detalle 
-# interesante es que, al capturar mejor la curvatura de la experiencia, 
-# los saltos por Seniority se ajustaron levemente (por ejemplo, el salto por ser 
-# Senior pasó de ~71% en el modelo 2 a ~51% en el modelo 3). 
-
-# En los modelos anteriores, como la recta no lograba subir lo suficiente en los
-# primeros años, el modelo "inflaba" el coeficiente del Seniority para compensar. 
-# Ahora el modelo es mucho más preciso aislando qué aumento es por años de 
-# experiencia y qué aumento es por ascenso de rol.
+# Genero: Mujer coef -0.103 → ~9.8% menos (***)
+# Region: GBA -0.082 → ~7.9% menos | Interior -0.136 → ~12.7% menos (***)
 
 
 #### GRAFICOS MODELO 3 ####
+
+
 # ---------------------------------------------------------
-# GRÁFICO 1: VISUALIZACIÓN DEL MODELO 3 (Curvas Polinómicas)
+# GRAFICO 1: VISUALIZACION DEL MODELO 3 (Curvas Polinmicas)
 # ---------------------------------------------------------
 
-# 1. Creamos la grilla (usamos las mismas variables que en mod2, pero predecimos con mod3)
-grilla_modp3 <- df_modelo %>%
+# Las curvas muestran el techo salarial: crecimiento rapido hasta ~15 años,
+# luego desaceleracion. Los dolarizados alcanzan un pico mas alto.
+# Dentro de cada panel, la distancia vertical entre Junior/Semi-Senior/Senior
+# se mantiene constante — los ascensos siguen garantizando saltos significativos.grilla_modp3 <- df_modelo %>%
   data_grid(
     experiencia = seq_range(c(0,30), n = 50),
     grupo_rol,
@@ -288,7 +277,8 @@ grilla_modp3 <- df_modelo %>%
   ) %>%
   add_predictions(modp3, var = "pred")
 
-# 2. Graficamos superponiendo las curvas al scatter plot
+
+
 ggplot(df_modelo, aes(x = experiencia, y = log_sal_usd)) +
   geom_point(alpha = 0.2, color = "black") +
   geom_line(data = grilla_modp3, aes(y = pred, color = sueldo_dolarizado, linetype = seniority), size = 1) +
@@ -306,15 +296,17 @@ ggplot(df_modelo, aes(x = experiencia, y = log_sal_usd)) +
 
 
 # ---------------------------------------------------------
-# GRÁFICO 2: DIAGNÓSTICO DE RESIDUOS (mod3)
+# GRAFICO 2: DIAGNOSTICO DE RESIDUOS (mod3)
 # ---------------------------------------------------------
 
-# Calculamos predicciones y residuos sobre los datos reales usando mod3
-df_residuos_p3 <- df_modelo %>%
+# Residuos bien centrados en 0 a lo largo de todo el rango de predicciones —
+# mejor comportamiento que modp1 y modp2.
+# La nube es simetrica sin patron visible: el modelo captura bien la estructura principal.df_residuos_p3 <- df_modelo %>%
   add_predictions(modp3, var = "pred") %>%
   add_residuals(modp3, var = "resid")
 
-# Graficamos los residuos
+
+
 ggplot(df_residuos_p3, aes(x = pred, y = resid)) +
   geom_point(alpha = 0.3, color = "black") +
   geom_hline(yintercept = 0, color = "red", size = 1) +
@@ -325,23 +317,13 @@ ggplot(df_residuos_p3, aes(x = pred, y = resid)) +
   ) +
   theme_minimal()
 
-# Observaciones de graficos mod3
-# El gráfico muestracómo los sueldos crecen velozmente durante los primeros 
-# 10 a 15 años de experiencia, pero luego alcanzan un "techo" a partir 
-# de los 20 o 30 años.
-
-# Las curvas color turquesa (Dolarizado = TRUE) no solo tienen una pendiente 
-# inicial más alta, sino que llegan a un pico salarial mucho más alto que 
-# las curvas rojas (FALSE)
-# Esto ilustra que cobrar en moneda extranjera cambia por completo la dinámica 
-# del crecimiento a lo largo de los años.
-
-# Dentro de cada panel (como Desarrollo o Datos) y color, las curvas mantienen su
-# distancia vertical según sean líneas continuas (Junior), punteadas (Semi-Senior)
-# o a rayas (Senior)
-# Esto demuestra que los ascensos de categoría siguen garantizando grandes saltos 
-# salariales sin importar la etapa de la curva en la que se encuentre.
 
 
-##### Comparando mod1, mod2 y mod3 con ANOVA ####
-anova(modp1,modp2,modp3)
+##### Comparacion modp1, modp2 y modp3 con ANOVA ####
+anova(modp1, modp2, modp3)
+
+# Resultado ANOVA:
+# modp1 -> modp2: F = 640.26, p < 2.2e-16 *** — agregar dolarizacion mejora significativamente
+# modp2 -> modp3: F = 105.38, p < 2.2e-16 *** — agregar curvatura mejora significativamente
+# Cada modelo agrega poder explicativo real — el modelo 3 es el mas completo.
+

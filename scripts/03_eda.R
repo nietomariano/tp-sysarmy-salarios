@@ -200,7 +200,11 @@ ggplot(df, aes(y = log_sal_usd)) +
     y = "Logaritmo del salario (USD)",
     x = ""
   ) +
-  theme_minimal()
+  theme_minimal()+
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()
+  )
 
 
 # -----------------------------------------------------------------------------
@@ -237,20 +241,6 @@ ggplot(df, aes(x = edad, y = log_sal_usd)) +
     x = "Edad (años)",
     y = "Logaritmo del salario (USD)",
     caption = "Línea roja: ajuste lineal"
-  ) +
-  theme_minimal()
-
-
-# Relacion entre Personas a cargo y salario
-# 80% de observaciones en x=0 - Aplicamos filtro en el siguiente grafico
-ggplot(df, aes(x = gente_a_cargo, y = log_sal_usd)) +
-  geom_jitter(alpha = 0.5, color = "purple") +
-  geom_smooth(method = "lm") +
-  labs(
-    title = "Relación entre personas a cargo y salario",
-    x = "Cantidad de personas a cargo",
-    y = "Logaritmo del salario (USD)",
-    caption = "Línea roja: ajuste lineal | Zona gris: margen de incertidumbre"
   ) +
   theme_minimal()
 
@@ -381,7 +371,7 @@ ggplot(df %>% filter(!is.na(sueldo_dolarizado)),
     x = "Años de experiencia",
     y = "Logaritmo del salario (USD)",
     color = "Tipo de sueldo",
-    caption = "Solo períodos 2024-2026"
+    caption = "Solo períodos 2024-2026 | Línea: ajuste lineal | Zona gris: intervalo de confianza"
   ) +
   theme_minimal()
 

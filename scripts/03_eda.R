@@ -565,7 +565,7 @@ top_roles <- df %>%
   pull(trabajo_de)
 
 # Boxplot de salario por rol — ordenado por mediana, coloreado por grupo
-# Los 3 puestos mejor pagos son de gestion e infraestructura: Manager/Director, Architect y Technical Leader
+# Los grupos de roles mejor pagos son de gestion e infraestructura: (Manager/Director y Architect)
 # Los roles de Datos/AI (Business Analyst, BI Analyst, Data analyst) se ubican en la mitad baja
 # QA/Tester tiene la mediana mas baja — Desarrollo/QA concentra los roles peor pagos
 # Developer tiene alta dispersion hacia la derecha — outliers de salarios muy altos
@@ -641,7 +641,7 @@ df %>%
 
 roles_amenazados <- c("BI Analyst / Data Analyst", "Business Analyst")
 roles_nativos    <- c("Data Scientist", "AI Engineer", "AI / Prompt / Chatbots")
-roles_tecnico    <- c("Data Engineer", "SysAdmin / DevOps / SRE", "DBA")
+roles_tecnico    <- c("Data Engineer", "SysAdmin / DevOps / SRE", "DBA","DBA (Database Administrator)")
 
 df_ia_rol <- df %>%
   filter(

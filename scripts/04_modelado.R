@@ -8,7 +8,8 @@ df <- read_csv(
 # Ajustando datasets y NA (toma desde el año 2024)
 
 df_modelo <- df %>%
-  drop_na(log_sal_usd, experiencia, grupo_rol, seniority)
+  drop_na(log_sal_usd, experiencia, grupo_rol, seniority, 
+          sueldo_dolarizado, genero_simple, region)
 
 dim(df_modelo)
 
@@ -39,10 +40,10 @@ dim(df_modelo)
 
 # ---
 #### Modelo 1: Salarios según la experiencia, grupo rol, seniority ####
-mod1 <- lm(log_sal_usd ~ experiencia + grupo_rol + seniority, 
-           data = df_modelo)
+modp1 <- lm(log_sal_usd ~ experiencia + grupo_rol + seniority + genero_simple + region,
+            data = df_modelo)
 
-summary(mod1)
+summary(modp1)
 
 #### Observaciones mod1: ####
 #   (Multiple R-squared): El valor es 0.2541
@@ -79,44 +80,48 @@ summary(mod1)
 
 # Creamos una grilla con todas las combinaciones posibles de nuestras variables
 # Usamos seq_range para generar una secuencia suave de años de experiencia
-grilla_mod1 <- df_modelo %>%
+grilla_modp1 <- df_modelo %>%
   data_grid(
     experiencia = seq_range(experiencia, n = 50),
     grupo_rol,
-    seniority
+    seniority,
+    genero_simple = "Hombre",
+    region = "CABA"
   ) %>%
-  add_predictions(mod1, var = "pred") # Agregamos la predicción del modelo 1
+  add_predictions(modp1, var = "pred") # Agregamos la predicción del modelo 1
 
 
 # Graficamos los datos reales y le superponemos las rectas de las predicciones
 ggplot(df_modelo, aes(x = experiencia, y = log_sal_usd)) +
   geom_point(alpha = 0.2, color = "black") +
-  geom_line(data = grilla_mod1, aes(y = pred, color = seniority), size = 1) + # Rectas del modelo
-  facet_wrap(~ grupo_rol) + # Divide un gráfico por cada Grupo de Rol
+  geom_line(data = grilla_modp1, aes(y = pred, color = seniority), size = 1) +
+  facet_wrap(~ grupo_rol) +
   labs(
-    title = "Modelo 1: Salario vs Experiencia según Rol y Seniority",
-    subtitle = "Tomado desde el año 2024",
-    x = "Años de Experiencia",
-    y = "Logaritmo del Salario (USD)",
+    title = "Modelo P1: Salario vs Experiencia según Rol y Seniority",
+    subtitle = "Género: Hombre | Región: CABA",
+    x = "Años de experiencia",
+    y = "Logaritmo del salario (USD)",
     color = "Seniority"
   ) +
   theme_bw()
+
+
 
 # ---------------------------------------------------------
 # GRÁFICO 2: DIAGNÓSTICO DE RESIDUOS (Residuos vs Predicciones)
 # ---------------------------------------------------------
 
 # Calculamos predicciones y residuos sobre los datos reales
-df_residuos1 <- df_modelo %>%
-  add_predictions(mod1, var = "pred") %>%
-  add_residuals(mod1, var = "resid")
+df_residuos_p1 <- df_modelo %>%
+  add_predictions(modp1, var = "pred") %>%
+  add_residuals(modp1, var = "resid")
 
 # Graficamos
-ggplot(df_residuos1, aes(x = pred, y = resid)) +
+ggplot(df_residuos_p1, aes(x = pred, y = resid)) +
   geom_point(alpha = 0.3, color = "black") +
-  geom_hline(yintercept = 0, color = "red", size = 1) + # Línea de referencia en el 0
+  geom_hline(yintercept = 0, color = "red", size = 1) +
   labs(
-    title = "Gráfico de Residuos vs. Predicciones (mod1)",
+    title = "Residuos vs Predicciones (modp1)",
     x = "Predicciones (log_sal_usd estimado)",
     y = "Residuos"
   ) +
@@ -124,10 +129,10 @@ ggplot(df_residuos1, aes(x = pred, y = resid)) +
 
 
 #### Modelo 2: Salarios según la experiencia con interaccion sueldo_dolarizado, grupo rol, seniority ####
-mod2 <- lm(log_sal_usd ~ experiencia * sueldo_dolarizado + grupo_rol + seniority, 
-           data = df_modelo)
+modp2 <- lm(log_sal_usd ~ experiencia * sueldo_dolarizado + grupo_rol + seniority + genero_simple + region,
+            data = df_modelo)
 
-summary(mod2)
+summary(modp2)
 
 #### Observaciones mod2: ####
 # El Multiple R-squared saltó a 0.3109.
@@ -173,26 +178,27 @@ summary(mod2)
 # ---------------------------------------------------------
 
 # 1. Creamos la grilla agregando 'sueldo_dolarizado'
-grilla_mod2 <- df_modelo %>%
+grilla_modp2 <- df_modelo %>%
   data_grid(
     experiencia = seq_range(experiencia, n = 50),
     grupo_rol,
     seniority,
-    sueldo_dolarizado # Nueva variable del mod2
+    sueldo_dolarizado,
+    genero_simple = "Hombre",
+    region = "CABA"
   ) %>%
-  add_predictions(mod2, var = "pred")
+  add_predictions(modp2, var = "pred")
 
 # 2. Graficamos superponiendo las rectas al scatter plot
 ggplot(df_modelo, aes(x = experiencia, y = log_sal_usd)) +
   geom_point(alpha = 0.2, color = "black") +
-  # Usamos color para la dolarización y tipo de línea para el seniority
-  geom_line(data = grilla_mod2, aes(y = pred, color = sueldo_dolarizado, linetype = seniority), size = 1) + 
+  geom_line(data = grilla_modp2, aes(y = pred, color = sueldo_dolarizado, linetype = seniority), size = 1) +
   facet_wrap(~ grupo_rol) +
   labs(
-    title = "Modelo 2: Salario vs Experiencia (Interacción Dolarizado)",
-    subtitle = "Tomado desde el año 2024",
-    x = "Años de Experiencia",
-    y = "Logaritmo del Salario (USD)",
+    title = "Modelo P2: Salario vs Experiencia (interacción dolarización)",
+    subtitle = "Género: Hombre | Región: CABA",
+    x = "Años de experiencia",
+    y = "Logaritmo del salario (USD)",
     color = "Dolarizado",
     linetype = "Seniority"
   ) +
@@ -203,25 +209,26 @@ ggplot(df_modelo, aes(x = experiencia, y = log_sal_usd)) +
 # ---------------------------------------------------------
 
 # Calculamos predicciones y residuos sobre los datos reales
-df_residuos2 <- df_modelo %>%
-  add_predictions(mod2, var = "pred") %>%
-  add_residuals(mod2, var = "resid")
+df_residuos_p2 <- df_modelo %>%
+  add_predictions(modp2, var = "pred") %>%
+  add_residuals(modp2, var = "resid")
 
 # Graficamos los residuos
-ggplot(df_residuos2, aes(x = pred, y = resid)) +
+ggplot(df_residuos_p2, aes(x = pred, y = resid)) +
   geom_point(alpha = 0.3, color = "black") +
-  geom_hline(yintercept = 0, color = "red", size = 1) + 
+  geom_hline(yintercept = 0, color = "red", size = 1) +
   labs(
-    title = "Gráfico de Residuos vs. Predicciones (mod2)",
+    title = "Residuos vs Predicciones (modp2)",
     x = "Predicciones (log_sal_usd estimado)",
     y = "Residuos"
   ) +
   theme_minimal()
 
 #### Modelo 3: Probando experiencia con poly y su interaccion con dolarizado + grupo rol + seniority ####
-mod3 <- lm(log_sal_usd ~ poly(experiencia, 2) * sueldo_dolarizado + grupo_rol + seniority, data = df_modelo)
+modp3 <- lm(log_sal_usd ~ poly(experiencia, 2) * sueldo_dolarizado + grupo_rol + seniority + genero_simple + region,
+            data = df_modelo)
 
-summary(mod3)
+summary(modp3)
 
 #### Observaciones mod3: ####
 # El Modelo 2 explicaba el 31.09% de la varianza. Al permitir que la experiencia 
@@ -270,44 +277,49 @@ summary(mod3)
 # ---------------------------------------------------------
 
 # 1. Creamos la grilla (usamos las mismas variables que en mod2, pero predecimos con mod3)
-grilla_mod3 <- df_modelo %>%
+grilla_modp3 <- df_modelo %>%
   data_grid(
-    experiencia = seq_range(experiencia, n = 50),
+    experiencia = seq_range(c(0,30), n = 50),
     grupo_rol,
     seniority,
-    sueldo_dolarizado
+    sueldo_dolarizado,
+    genero_simple = "Hombre",
+    region = "CABA"
   ) %>%
-  add_predictions(mod3, var = "pred")
+  add_predictions(modp3, var = "pred")
 
 # 2. Graficamos superponiendo las curvas al scatter plot
 ggplot(df_modelo, aes(x = experiencia, y = log_sal_usd)) +
   geom_point(alpha = 0.2, color = "black") +
-  geom_line(data = grilla_mod3, aes(y = pred, color = sueldo_dolarizado, linetype = seniority), size = 1) + 
+  geom_line(data = grilla_modp3, aes(y = pred, color = sueldo_dolarizado, linetype = seniority), size = 1) +
   facet_wrap(~ grupo_rol) +
   labs(
-    title = "Modelo 3: Salario vs Experiencia (Curvas Polinómicas con Interacción)",
-    x = "Años de Experiencia",
-    y = "Logaritmo del Salario (USD)",
+    title = "Modelo P3: Salario vs Experiencia (curvas polinómicas)",
+    subtitle = "Género: Hombre | Región: CABA",
+    x = "Años de experiencia",
+    y = "Logaritmo del salario (USD)",
     color = "Dolarizado",
     linetype = "Seniority"
   ) +
   theme_bw()
+
+
 
 # ---------------------------------------------------------
 # GRÁFICO 2: DIAGNÓSTICO DE RESIDUOS (mod3)
 # ---------------------------------------------------------
 
 # Calculamos predicciones y residuos sobre los datos reales usando mod3
-df_residuos3 <- df_modelo %>%
-  add_predictions(mod3, var = "pred") %>%
-  add_residuals(mod3, var = "resid")
+df_residuos_p3 <- df_modelo %>%
+  add_predictions(modp3, var = "pred") %>%
+  add_residuals(modp3, var = "resid")
 
 # Graficamos los residuos
-ggplot(df_residuos3, aes(x = pred, y = resid)) +
-  geom_point(alpha = 0.3, color = "black") + # Cambiamos el color para distinguirlo
-  geom_hline(yintercept = 0, color = "red", size = 1) + 
+ggplot(df_residuos_p3, aes(x = pred, y = resid)) +
+  geom_point(alpha = 0.3, color = "black") +
+  geom_hline(yintercept = 0, color = "red", size = 1) +
   labs(
-    title = "Gráfico de Residuos vs. Predicciones (mod3 - Polinómico)",
+    title = "Residuos vs Predicciones (modp3)",
     x = "Predicciones (log_sal_usd estimado)",
     y = "Residuos"
   ) +
@@ -332,4 +344,4 @@ ggplot(df_residuos3, aes(x = pred, y = resid)) +
 
 
 ##### Comparando mod1, mod2 y mod3 con ANOVA ####
-anova(mod1,mod2,mod3)
+anova(modp1,modp2,modp3)

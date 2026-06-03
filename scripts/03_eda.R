@@ -786,53 +786,86 @@ df %>%
 # 10. CONCLUSIONES DEL EDA
 # -----------------------------------------------------------------------------
 
-# VARIABLES CON MAYOR PODER EXPLICATIVO:
-# - Seniority: separacion clara entre niveles, mayor señal del EDA
-# - Experiencia: relacion positiva pero con alta dispersion
-# - Grupo de rol: diferencias moderadas entre grupos. Management lidera,
-#   Desarrollo / QA queda en el extremo inferior a nivel de grupo.
-#   A nivel de rol individual, Manager / Director y Architect son los más altos.
-# - Genero: persiste una brecha a favor de hombres incluso controlando por seniority
-
-# VARIABLES CON MENOR PODER EXPLICATIVO:
-# - Dolarizacion: en pesos nominales mostraba brecha del 34%, pero al deflactar
-#   por dolar blue la diferencia practicamente desaparece
-# - Modalidad: medianas similares entre remoto, hibrido y presencial
-# - Tamaño de empresa: sin tendencia clara ni consistente
-# - Region: mercado IT relativamente homogeneo geograficamente
-
-# VARIABLE CONFUNDIDORA IDENTIFICADA:
-# - Seniority confunde parcialmente la relacion genero-salario
-# - Hombres tienen mayor proporcion de Senior (~53%) vs mujeres (~35%)
-# - Sin embargo la brecha persiste dentro de cada nivel de seniority
-
-
+  # VARIABLES CON MAYOR PODER EXPLICATIVO:
+  # - Seniority: mayor señal del EDA — separacion clara y progresiva entre los tres niveles.
+  #   Junior mediana ~7.0, Semi-Senior ~7.5, Senior ~7.8 (log_sal_usd).
+  #   Confirmado por el modelo: ascender a Senior implica un incremento del ~70% sobre Junior.
+  #
+  # - Gente a cargo: tendencia progresiva y consistente — la mediana sube de ~7.0 (sin equipo)
+  #   a ~7.8 (equipo grande). Es la variable numerica con la señal más limpia del EDA.
+  #
+  # - Grupo de rol: Roles de gestion lidera con mediana claramente superior al resto.
+  #   Los cuatro grupos tecnicos (Ciberseguridad, Datos/AI, Infraestructura, Desarrollo/QA)
+  #   muestran medianas muy comprimidas entre si — las diferencias existen pero son pequeñas.
+  #   A nivel de rol individual, Manager/Director y Architect son los mejor pagos;
+  #   QA/Tester y Consultant son los peores pagos del top 10.
+  #
+  # - Experiencia: relacion positiva pero con alta dispersion — no determina el salario de 
+  #   forma aislada. Hallazgo destacado: la pendiente es más pronunciada en Desarrollo/QA —
+  #   ese grupo arranca con el intercepto más bajo pero es el que más se beneficia
+  #   de cada año adicional de experiencia (ver Rplot20).
+  #
+  # - Genero: brecha a favor de hombres visible sin controlar (Rplot13).
+  #   Al controlar por seniority las cajas se solapan dentro de cada nivel,
+  #   pero la brecha persiste — especialmente en Semi-Senior y Senior.
+  #   Confirmado por el modelo: ser mujer se asocia con un salario ~10% menor (coef. -0.106, ***).
+  #
+  # - Dolarizacion: su efecto no es directo sino mediado por la experiencia.
+  #   Las medianas de arranque son similares entre grupos, pero los dolarizados muestran
+  #   mayor dispersion hacia salarios altos (IQR mas amplio — Rplot10).
+  #   El efecto principal aparece en la interaccion con experiencia: la pendiente salarial
+  #   de los dolarizados es significativamente mas pronunciada — la brecha crece con los
+  #   años de carrera (Rplot11). Confirmado en el modelo: la interaccion
+  #   experiencia:sueldo_dolarizado es altamente significativa (***) y sube el R²
+  #   de 0.2881 a 0.3373.
+  #
+  #
+  #
+  #
+  # VARIABLES CON MENOR PODER EXPLICATIVO:
+  #
+  # - Modalidad: Remoto e Hibrido muestran medianas similares (~7.2 en log_sal_usd).
+  #   Presencial queda claramente por debajo (~6.9) — diferencia equivalente a ~26% en USD.
+  #   La distincion relevante es Presencial vs el resto, no entre Remoto e Hibrido.
+  #
+  # - Region: CABA y GBA/Prov. BA muestran medianas casi identicas.
+  #   Interior es la que queda por debajo de forma consistente.
+  #   El modelo confirma: GBA = -0.062, Interior = -0.123 respecto a CABA.
+  #   El mercado IT es relativamente homogeneo entre CABA y GBA; Interior muestra
+  #   una diferencia real pero moderada (~13% menos que CABA).
+  #
+  # - Tamaño de empresa: sin tendencia clara ni consistente (Rplot12).
+  #   Leve crecimiento hasta empresas medianas pero se estabiliza — no es un predictor relevante.
+  #
   # HALLAZGOS SOBRE USO DE IA (2024-2026):
-# - La adopcion crecio en todos los grupos: de ~30% a ~65-70% de uso alto en dos años
-# - Ciberseguridad es el grupo que adopta más lento
-# - Contraintuitivo: los juniors usan IA mas intensamente que los seniors
-# - El uso de IA no se traduce directamente en mayor salario — esta mediado por rol y seniority
+  # - La adopcion crecio en todos los grupos: de ~25-37% a ~60-70% de uso alto en dos años.
+  # - Ciberseguridad es el grupo que adopta mas lento y queda rezagado al final.
+  # - Datos/AI lidera desde el inicio; Desarrollo/QA arranca bajo pero termina liderando.
+  # - Contraintuitivo: Junior y Semi-Senior usan IA mas intensamente que Senior (mediana 4 vs 3).
+  #   Interpretacion: los juniors ingresaron al mercado con IA ya disponible —
+  #   la adopcion se da de abajo hacia arriba en las organizaciones.
+  # - El uso de IA no se traduce directamente en mayor salario — esta mediado por rol y seniority.
+  #
+  # DECISION DE MODELADO:
+  # - Variable objetivo: log_sal_usd — salario deflactado por dolar blue (2019-2026)
+  # - Ambos modelos trabajan con datos desde 2024, unico periodo con seniority 
+  #   disponible (n = 17.079 tras drop_na)
+  #
+  # - Modelo 1: log_sal_usd ~ experiencia + grupo_rol + seniority + genero_simple + region
+  #   R² = 0.2881 | RSE = 0.552
+  #
+  # - Modelo 2: log_sal_usd ~ experiencia * sueldo_dolarizado + grupo_rol + seniority
+  #             + genero_simple + region
+  #   R² = 0.3373 | RSE = 0.533
+  #   La interaccion experiencia:sueldo_dolarizado es altamente significativa (***)
+  #
+  # - Modelo 3: log_sal_usd ~ poly(experiencia, 2) * sueldo_dolarizado + grupo_rol + seniority
+  #             + genero_simple + region
+  #   R² = 0.3454 | RSE = 0.530
+  #   Permite capturar la curvatura de la experiencia (rendimientos decrecientes)
+  #
+  # - Los tres modelos son comparados con ANOVA — cada uno agrega explicacion significativa (***)
+  #
+  # - Se espera que seniority sea el predictor con mayor impacto individual
+  #   y Roles de gestion el grupo con mayor intercepto relativo
   
-  
-# DECISION DE MODELADO ??
-# - Variable objetivo: log_sal_usd — salario deflactado por dolar blue
-# - Modelo 1: log_sal_usd ~ experiencia + grupo_rol + genero_simple + region + gente_a_cargo
-# - Modelo 2: agregar seniority
-# - Se espera que grupo_rol = Management sea la categoría con coeficiente más alto
-#   y Desarrollo / QA el de menor efecto marginal
-  
-  
-
-# DECISION DE MODELADO:
-# - Variable objetivo: log_sal_usd — salario deflactado por dolar blue
-
-# PREGUNTAS para generar hipotesis.. 
-#
-# Que rol maximiza el salario en dolares en el sector IT argentino, controlando por experiencia, region y genero?
-# Que rol y nivel de seniority  maximiza el salario en dolares en el sector IT argentino, controlando por experiencia, region y genero?
-#
-# Yendo por esas preguntas quizas un modelo podria ser:
-# Modelo 1: log_sal_usd ~ experiencia + grupo_rol + genero_simple + region + gente_a_cargo
-# Modelo 2: agregar seniority
-# Se espera que grupo_rol = Management sea la categoría con coeficiente más alto
-# y Desarrollo / QA el de menor efecto marginal
